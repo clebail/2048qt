@@ -32,7 +32,7 @@ void CWGame::calculFont(int valeur, int tailleMax) {
         taille = fm.width(texte) + 2 * TRAIT;
 
         fontSize--;
-    }while(taille > tailleMax);
+    }while(taille > tailleMax && fontSize > 1);
 }
 //-----------------------------------------------------------------------------
 CWGame::EResultat CWGame::joue(CDeplacement *dep) {
