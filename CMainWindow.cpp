@@ -9,6 +9,7 @@ CMainWindow::CMainWindow(QWidget *parent) : QMainWindow(parent) {
     setupUi(this);
 
     installEventFilter(this);
+    lblScore->setText("Score : "+QString::number(wGame->getScore()));
 }
 //-----------------------------------------------------------------------------
 void CMainWindow::on_actQuitter_triggered() {

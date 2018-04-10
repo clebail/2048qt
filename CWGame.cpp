@@ -4,9 +4,10 @@
 #include <tgmath.h>
 #include "CWGame.h"
 //-----------------------------------------------------------------------------
-#define TRAIT   6
+#define TRAIT       6
+#define COULEURS    12
 //-----------------------------------------------------------------------------
-static QColor couleurs[] = {
+static QColor couleurs[COULEURS] = {
     QColor(0xA0, 0xA0, 0xA0), //0
     QColor(0xFF, 0xCD, 0xD2), //2
     QColor(0xF8, 0xBB, 0xD0), //4
@@ -24,15 +25,16 @@ static QColor couleurs[] = {
 void CWGame::calculFont(int valeur, int tailleMax) {
    int fontSize = 100;
     QString texte = QString::number(valeur);
-    int taille = 0;
+    int largeur = 0, hauteur = 0;
 
     do {
         font = QFont("Arial", fontSize);
         QFontMetrics fm(font);
-        taille = fm.width(texte) + 2 * TRAIT;
+        largeur = fm.width(texte) + 2 * TRAIT;
+        hauteur = fm.height() + 2 * TRAIT;
 
         fontSize--;
-    }while(taille > tailleMax && fontSize > 1);
+    }while((largeur > tailleMax || hauteur > tailleMax) && fontSize > 1);
 }
 //-----------------------------------------------------------------------------
 CWGame::EResultat CWGame::joue(CDeplacement *dep) {
@@ -72,7 +74,7 @@ void CWGame::paintEvent(QPaintEvent *) {
     QPen pen(Qt::darkGray);
     int i;
 
-    calculFont(qMax(10, score), tailleCase);
+    calculFont(score, tailleCase);
 
     pen.setWidth(TRAIT);
     painter.setPen(pen);
@@ -88,7 +90,7 @@ void CWGame::paintEvent(QPaintEvent *) {
         QRect rect(x, y, tailleCase, tailleCase);
 
         if(grille[i] != 0) {
-            idCouleur = log2(grille[i]);
+            idCouleur = (int)log2(grille[i]) % COULEURS;
         }
 
         painter.setPen(pen);
@@ -120,7 +122,9 @@ bool CWGame::ajout(void) {
     }
 
     if(nbVide != 0) {
-        grille[vides[rand() % nbVide]] = 2;
+        int idx = vides[rand() % nbVide];
+        grille[idx] = 2 * (rand() % 2 +1);
+        score = qMax(score, grille[idx]);
 
         return true;
     }
@@ -129,7 +133,7 @@ bool CWGame::ajout(void) {
 }
 //-----------------------------------------------------------------------------
 void CWGame::nouveau(void) {
-    score = 2;
+    score = 0;
     memset(grille, 0, CASE * sizeof(int));
 
     ajout();
