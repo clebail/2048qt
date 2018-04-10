@@ -68,7 +68,7 @@ bool CWGame::perdu(void) {
         }
     }
 
-    return true;
+    return grille[CASE-1] != grille[CASE-COTE-1] && grille[CASE-1] != grille[CASE-2];
 }
 //-----------------------------------------------------------------------------
 void CWGame::paintEvent(QPaintEvent *) {
