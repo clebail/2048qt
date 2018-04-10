@@ -46,8 +46,6 @@ CWGame::EResultat CWGame::joue(CDeplacement *dep) {
         if(score == 2048) {
             return CWGame::erGagne;
         }
-
-        return CWGame::erNone;
     }
 
     return perdu() ? CWGame::erPerdu : CWGame::erNone;
@@ -59,6 +57,14 @@ bool CWGame::perdu(void) {
     for(i=0;i<CASE;i++) {
         if(grille[i] == 0) {
             return false;
+        }
+    }
+
+    for(i=0;i<CASE-COTE;i++) {
+        if(i % COTE != COTE -1) {
+            if(grille[i] == grille[i+1] || grille[i] == grille[i + COTE]) {
+                return false;
+            }
         }
     }
 
