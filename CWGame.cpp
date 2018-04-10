@@ -61,13 +61,13 @@ bool CWGame::perdu(void) {
     }
 
     for(i=0;i<CASE;i++) {
-        if(i / COTE != COTE -1) {
-            if(grille[i] == grille[i + 1]) {
+        if(i / COTE != COTE - 1) {
+            if(grille[i] == grille[i + COTE]) {
                 return false;
             }
         }
-        if(i % COTE != COTE -1) {
-            if(grille[i] == grille[i + COTE]) {
+        if(i % COTE != COTE - 1) {
+            if(grille[i] == grille[i + 1]) {
                 return false;
             }
         }
