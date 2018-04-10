@@ -60,15 +60,20 @@ bool CWGame::perdu(void) {
         }
     }
 
-    for(i=0;i<CASE-COTE;i++) {
+    for(i=0;i<CASE;i++) {
+        if(i / COTE != COTE -1) {
+            if(grille[i] == grille[i + 1]) {
+                return false;
+            }
+        }
         if(i % COTE != COTE -1) {
-            if(grille[i] == grille[i+1] || grille[i] == grille[i + COTE]) {
+            if(grille[i] == grille[i + COTE]) {
                 return false;
             }
         }
     }
 
-    return grille[CASE-1] != grille[CASE-COTE-1] && grille[CASE-1] != grille[CASE-2];
+    return true;
 }
 //-----------------------------------------------------------------------------
 void CWGame::paintEvent(QPaintEvent *) {
@@ -96,7 +101,7 @@ void CWGame::paintEvent(QPaintEvent *) {
         QRect rect(x, y, tailleCase, tailleCase);
 
         if(grille[i] != 0) {
-            idCouleur = (int)log2(grille[i]) % COULEURS;
+            idCouleur = ((int)log2(grille[i])) % COULEURS;
         }
 
         painter.setPen(pen);
@@ -129,7 +134,7 @@ bool CWGame::ajout(void) {
 
     if(nbVide != 0) {
         int idx = vides[rand() % nbVide];
-        grille[idx] = 2 * (rand() % 2 +1);
+        grille[idx] = 2 * (rand() % 2 + 1);
         score = qMax(score, grille[idx]);
 
         return true;
