@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>2048</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="2048.qrc">
+    <normaloff>:/images/2048.png</normaloff>:/images/2048.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -80,6 +84,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="2048.qrc"/>
+ </resources>
  <connections/>
 </ui>

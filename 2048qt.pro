@@ -38,3 +38,6 @@ HEADERS += \
 
 FORMS += \
         CMainWindow.ui
+
+RESOURCES += \
+    2048.qrc
