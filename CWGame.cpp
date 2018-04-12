@@ -154,7 +154,7 @@ CWGame::CWGame(QWidget *parent) : QWidget(parent) {
     forceFont = false;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    step = cpt = 0;
+    step = 0;
 
     srand(time(NULL));
     nouveau(); 

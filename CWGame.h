@@ -18,7 +18,7 @@ private:
     bool forceFont;
     QFont font;
     QTimer *timer;
-    int step, cpt;
+    int step;
 
     void calculFont(int valeur, int tailleMax);
     CWGame::EResultat joue(CDeplacement *dep);
