@@ -6,6 +6,10 @@
 //-----------------------------------------------------------------------------
 #define TRAIT       6
 #define COULEURS    12
+#define MS          1000
+#define IMG         24
+#define ANIM        8
+#define DELAI       (MS/IMG)
 //-----------------------------------------------------------------------------
 static QColor couleurs[COULEURS] = {
     QColor(0xA0, 0xA0, 0xA0), //0
@@ -23,18 +27,24 @@ static QColor couleurs[COULEURS] = {
 };
 //-----------------------------------------------------------------------------
 void CWGame::calculFont(int valeur, int tailleMax) {
-   int fontSize = 100;
-    QString texte = QString::number(valeur);
-    int largeur = 0, hauteur = 0;
+    static int oldValeur = 0;
+    if(valeur != oldValeur || forceFont) {
+        int fontSize = 100;
+        QString texte = QString::number(valeur);
+        int largeur = 0, hauteur = 0;
 
-    do {
-        font = QFont("Arial", fontSize);
-        QFontMetrics fm(font);
-        largeur = fm.width(texte) + 2 * TRAIT;
-        hauteur = fm.height() + 2 * TRAIT;
+        do {
+            font = QFont("Arial", fontSize);
+            QFontMetrics fm(font);
+            largeur = fm.width(texte) + 2 * TRAIT;
+            hauteur = fm.height() + 2 * TRAIT;
 
-        fontSize--;
-    }while((largeur > tailleMax || hauteur > tailleMax) && fontSize > 1);
+            fontSize--;
+        }while((largeur > tailleMax || hauteur > tailleMax) && fontSize > 1);
+
+        oldValeur = valeur;
+        forceFont = false;
+    }
 }
 //-----------------------------------------------------------------------------
 CWGame::EResultat CWGame::joue(CDeplacement *dep) {
@@ -42,7 +52,6 @@ CWGame::EResultat CWGame::joue(CDeplacement *dep) {
         if(!ajout()) {
             return CWGame::erPerdu;
         }
-        repaint();
         if(score == 2048) {
             return CWGame::erGagne;
         }
@@ -76,6 +85,12 @@ bool CWGame::perdu(void) {
     return true;
 }
 //-----------------------------------------------------------------------------
+void CWGame::onTimer(void) {
+    step++;
+
+    repaint();
+}
+//-----------------------------------------------------------------------------
 void CWGame::paintEvent(QPaintEvent *) {
     QPainter painter(this);
     int taille = qMin(width(), height()) - TRAIT * COTE;
@@ -104,20 +119,52 @@ void CWGame::paintEvent(QPaintEvent *) {
             idCouleur = ((int)log2(grille[i])) % COULEURS;
         }
 
+        if(i == idxNouveau) {
+            double scale = (double)step/(double)ANIM;
+            int newTaille = tailleCase * scale;
+            int translate = (tailleCase - newTaille) / 2;
+
+            rect.setX(x + translate);
+            rect.setY(y + translate);
+            rect.setWidth(newTaille);
+            rect.setHeight(newTaille);
+        }
+
         painter.setPen(pen);
         painter.setBrush(QBrush(couleurs[idCouleur]));
         painter.drawRect(rect);
 
-        if(grille[i] != 0) {
+        if(grille[i] != 0 && i != idxNouveau) {
             painter.setPen(QPen(Qt::black));
             painter.drawText(rect, Qt::AlignCenter, QString::number(grille[i]));
+        }
+
+        if(step == ANIM - 1) {
+            idxNouveau = -1;
         }
     }
 }
 //-----------------------------------------------------------------------------
+void CWGame::resizeEvent(QResizeEvent *) {
+    forceFont = true;
+}
+//-----------------------------------------------------------------------------
 CWGame::CWGame(QWidget *parent) : QWidget(parent) {
+    idxNouveau = -1;
+    forceFont = false;
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    step = cpt = 0;
+
     srand(time(NULL));
-    nouveau();
+    nouveau(); 
+
+    timer->setInterval(DELAI);
+    timer->start();
+}
+//-----------------------------------------------------------------------------
+CWGame::~CWGame(void) {
+    delete timer;
 }
 //-----------------------------------------------------------------------------
 bool CWGame::ajout(void) {
@@ -133,9 +180,10 @@ bool CWGame::ajout(void) {
     }
 
     if(nbVide != 0) {
-        int idx = vides[rand() % nbVide];
-        grille[idx] = 2 * (rand() % 2 + 1);
-        score = qMax(score, grille[idx]);
+        idxNouveau = vides[rand() % nbVide];
+        grille[idxNouveau] = 2 * (rand() % 2 + 1);
+        score = qMax(score, grille[idxNouveau]);
+        step = 0;
 
         return true;
     }
@@ -149,8 +197,6 @@ void CWGame::nouveau(void) {
 
     ajout();
     ajout();
-
-    repaint();
 }
 //-----------------------------------------------------------------------------
 CWGame::EResultat CWGame::haut(void) {
