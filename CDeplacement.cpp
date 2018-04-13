@@ -3,7 +3,7 @@
 #include <QtDebug>
 #include "CDeplacement.h"
 //-----------------------------------------------------------------------------
-bool CDeplacement::deplacement(int *grille, int &score) {
+bool CDeplacement::deplacement(SCase *grille, int &score) {
     bool move;
     int nbMove = 0;
 
@@ -15,18 +15,19 @@ bool CDeplacement::deplacement(int *grille, int &score) {
             int i = getIdx();
             int voisin = getVoisin(i);
 
-            if(grille[i] != 0) {
-                if(grille[voisin] == grille[i]) {
-                    grille[voisin] *= 2;
-                    grille[i] = 0;
+            if(grille[i].valeur != 0) {
+                if(grille[voisin].valeur == grille[i].valeur) {
+                    grille[voisin].valeur *= 2;
+                    grille[voisin].fusion = true;
+                    grille[i].valeur = 0;
 
-                    score = qMax(grille[voisin], score);
+                    score = qMax(grille[voisin].valeur, score);
 
                     move = true;
                     nbMove++;
-                } else if(grille[voisin] == 0) {
-                    grille[voisin] = grille[i];
-                    grille[i] = 0;
+                } else if(grille[voisin].valeur == 0) {
+                    grille[voisin].valeur = grille[i].valeur;
+                    grille[i].valeur = 0;
 
                     move = true;
                     nbMove++;

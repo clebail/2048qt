@@ -1,6 +1,7 @@
 //-----------------------------------------------------------------------------
 #include <QPainter>
 #include <QtDebug>
+#include <QGraphicsBlurEffect>
 #include <tgmath.h>
 #include "CWGame.h"
 //-----------------------------------------------------------------------------
@@ -64,19 +65,19 @@ bool CWGame::perdu(void) {
     int i;
 
     for(i=0;i<CASE;i++) {
-        if(grille[i] == 0) {
+        if(grille[i].valeur == 0) {
             return false;
         }
     }
 
     for(i=0;i<CASE;i++) {
         if(i / COTE != COTE - 1) {
-            if(grille[i] == grille[i + COTE]) {
+            if(grille[i].valeur == grille[i + COTE].valeur) {
                 return false;
             }
         }
         if(i % COTE != COTE - 1) {
-            if(grille[i] == grille[i + 1]) {
+            if(grille[i].valeur == grille[i + 1].valeur) {
                 return false;
             }
         }
@@ -107,19 +108,17 @@ void CWGame::paintEvent(QPaintEvent *) {
     painter.setBrush(QBrush(couleurs[0]));
     painter.drawRect(xD, yD, taille, taille);
 
-    painter.setFont(font);
-
     for(i=0;i<CASE;i++) {
         int x = (i % COTE) * tailleCase + xD;
         int y = (i / COTE) * tailleCase + yD;
         int idCouleur = 0;
         QRect rect(x, y, tailleCase, tailleCase);
 
-        if(grille[i] != 0) {
-            idCouleur = ((int)log2(grille[i])) % COULEURS;
+        if(grille[i].valeur != 0) {
+            idCouleur = ((int)log2(grille[i].valeur)) % COULEURS;
         }
 
-        if(i == idxNouveau) {
+        if(grille[i].nouveau) {
             double scale = (double)step/(double)ANIM;
             int newTaille = tailleCase * scale;
             int translate = (tailleCase - newTaille) / 2;
@@ -134,13 +133,19 @@ void CWGame::paintEvent(QPaintEvent *) {
         painter.setBrush(QBrush(couleurs[idCouleur]));
         painter.drawRect(rect);
 
-        if(grille[i] != 0 && i != idxNouveau) {
+        if(grille[i].valeur != 0 && !grille[i].nouveau) {
+            QFont font(this->font);
+            if(grille[i].fusion) {
+                font.setPointSize(this->font.pointSize() / (ANIM - step));
+            }
+            painter.setFont(font);
             painter.setPen(QPen(Qt::black));
-            painter.drawText(rect, Qt::AlignCenter, QString::number(grille[i]));
+            painter.drawText(rect, Qt::AlignCenter, QString::number(grille[i].valeur));
         }
 
         if(step == ANIM - 1) {
-            idxNouveau = -1;
+            grille[i].nouveau = false;
+            grille[i].fusion = false;
         }
     }
 }
@@ -150,7 +155,6 @@ void CWGame::resizeEvent(QResizeEvent *) {
 }
 //-----------------------------------------------------------------------------
 CWGame::CWGame(QWidget *parent) : QWidget(parent) {
-    idxNouveau = -1;
     forceFont = false;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
@@ -173,16 +177,17 @@ bool CWGame::ajout(void) {
     int i, j;
 
     for(i=j=0;i<CASE;i++) {
-        if(grille[i] == 0) {
+        if(grille[i].valeur == 0) {
             nbVide++;
             vides[j++] = i;
         }
     }
 
     if(nbVide != 0) {
-        idxNouveau = vides[rand() % nbVide];
-        grille[idxNouveau] = 2 * (rand() % 2 + 1);
-        score = qMax(score, grille[idxNouveau]);
+        int idx = vides[rand() % nbVide];
+        grille[idx].valeur = 2 * (rand() % 2 + 1);
+        grille[idx].nouveau = true;
+        score = qMax(score, grille[idx].valeur);
         step = 0;
 
         return true;
@@ -193,7 +198,7 @@ bool CWGame::ajout(void) {
 //-----------------------------------------------------------------------------
 void CWGame::nouveau(void) {
     score = 0;
-    memset(grille, 0, CASE * sizeof(int));
+    memset(grille, 0, CASE * sizeof(SCase));
 
     ajout();
     ajout();

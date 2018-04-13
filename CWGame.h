@@ -13,8 +13,8 @@ public:
     typedef enum { erNone, erGagne, erPerdu } EResultat;
 private:
     int score;
-    int grille[CASE];
-    int idxNouveau;
+    SCase grille[CASE];
+    int fusion[CASE];
     bool forceFont;
     QFont font;
     QTimer *timer;

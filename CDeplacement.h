@@ -12,7 +12,7 @@ protected:
     virtual bool next(void) = 0;
     virtual void init(void) = 0;
 public:
-    bool deplacement(int *grille, int &score);
+    bool deplacement(SCase *grille, int &score);
     int getIdx(void);
     virtual ~CDeplacement(void) {}
 };
