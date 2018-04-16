@@ -15,7 +15,7 @@ bool CDeplacement::deplacement(SCase *grille, int &score) {
             int i = getIdx();
             int voisin = getVoisin(i);
 
-            if(grille[i].valeur != 0) {
+            if(grille[i].valeur != 0 && !grille[i].fusion && !grille[voisin].fusion) {
                 if(grille[voisin].valeur == grille[i].valeur) {
                     grille[voisin].valeur *= 2;
                     grille[voisin].fusion = true;
