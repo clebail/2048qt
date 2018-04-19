@@ -51,14 +51,15 @@ void CWGame::calculFont(int valeur, int tailleMax) {
 CWGame::EResultat CWGame::joue(CDeplacement *dep) {
     if(dep->deplacement(grille, score)) {
         if(!ajout()) {
-            return CWGame::erPerdu;
+            return gagne ? CWGame::erFin : CWGame::erPerdu;
         }
         if(score == 2048) {
+            gagne = true;
             return CWGame::erGagne;
         }
     }
 
-    return perdu() ? CWGame::erPerdu : CWGame::erNone;
+    return (perdu() ? (gagne ? CWGame::erFin : CWGame::erPerdu) : CWGame::erNone);
 }
 //-----------------------------------------------------------------------------
 bool CWGame::perdu(void) {
@@ -198,6 +199,7 @@ bool CWGame::ajout(void) {
 //-----------------------------------------------------------------------------
 void CWGame::nouveau(void) {
     score = 0;
+    gagne = false;
     memset(grille, 0, CASE * sizeof(SCase));
 
     ajout();

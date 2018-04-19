@@ -10,7 +10,7 @@
 class CWGame : public QWidget {
     Q_OBJECT
 public:
-    typedef enum { erNone, erGagne, erPerdu } EResultat;
+    typedef enum { erNone, erGagne, erPerdu, erFin } EResultat;
 private:
     int score;
     SCase grille[CASE];
@@ -19,6 +19,7 @@ private:
     QFont font;
     QTimer *timer;
     int step;
+    bool gagne;
 
     void calculFont(int valeur, int tailleMax);
     CWGame::EResultat joue(CDeplacement *dep);

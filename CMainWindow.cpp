@@ -62,6 +62,9 @@ bool CMainWindow::eventFilter(QObject *obj, QEvent *event) {
                 wGame->nouveau();
                 lblScore->setText("Score : "+QString::number(wGame->getScore()));
                 break;
+            case CWGame::erFin:
+                QMessageBox::information(this, "Fin de partie", "Votre partie est terminé !", QMessageBox::Ok);
+                break;
             default:
                 break;
             }

@@ -12,22 +12,21 @@ bool CDeplacement::deplacement(SCase *grille, int &score) {
 
         init();
         do {
-            int i = getIdx();
-            int voisin = getVoisin(i);
+            int voisin = getVoisin(idx);
 
-            if(grille[i].valeur != 0 && !grille[i].fusion && !grille[voisin].fusion) {
-                if(grille[voisin].valeur == grille[i].valeur) {
+            if(grille[idx].valeur != 0 && !grille[idx].fusion) {
+                if(grille[voisin].valeur == grille[idx].valeur && !grille[voisin].fusion) {
                     grille[voisin].valeur *= 2;
                     grille[voisin].fusion = true;
-                    grille[i].valeur = 0;
+                    grille[idx].valeur = 0;
 
                     score = qMax(grille[voisin].valeur, score);
 
                     move = true;
                     nbMove++;
                 } else if(grille[voisin].valeur == 0) {
-                    grille[voisin].valeur = grille[i].valeur;
-                    grille[i].valeur = 0;
+                    grille[voisin].valeur = grille[idx].valeur;
+                    grille[idx].valeur = 0;
 
                     move = true;
                     nbMove++;
@@ -39,17 +38,13 @@ bool CDeplacement::deplacement(SCase *grille, int &score) {
     return nbMove != 0;
 }
 //-----------------------------------------------------------------------------
-int CDeplacement::getIdx(void) {
-    return idx;
-}
-//-----------------------------------------------------------------------------
 int CDeplacementHaut::getVoisin(int idx) {
     return idx - COTE;
 }
 //-----------------------------------------------------------------------------
 bool CDeplacementHaut::next(void) {
-    if(this->idx + 1 < CASE) {
-        this->idx++;
+    if(idx + 1 < CASE) {
+        idx++;
         return true;
     }
 
@@ -65,10 +60,10 @@ int CDeplacementDroite::getVoisin(int idx) {
 }
 //-----------------------------------------------------------------------------
 bool CDeplacementDroite::next(void) {
-    if(this->idx - 1 >= 0) {
-        this->idx--;
-        if((this->idx) % COTE == COTE -1) {
-            this->idx--;
+    if(idx - 1 >= 0) {
+        idx--;
+        if(idx % COTE == COTE -1) {
+            idx--;
         }
 
         return true;
@@ -86,8 +81,8 @@ int CDeplacementBas::getVoisin(int idx) {
 }
 //-----------------------------------------------------------------------------
 bool CDeplacementBas::next(void) {
-    if(this->idx - 1 >= 0) {
-        this->idx--;
+    if(idx - 1 >= 0) {
+        idx--;
 
         return true;
     }
@@ -104,10 +99,10 @@ int CDeplacementGauche::getVoisin(int idx) {
 }
 //-----------------------------------------------------------------------------
 bool CDeplacementGauche::next(void) {
-    if(this->idx +1 < CASE) {
-        this->idx++;
-        if((this->idx) % COTE == 0) {
-            this->idx++;
+    if(idx +1 < CASE) {
+        idx++;
+        if(idx % COTE == 0) {
+            idx++;
         }
 
         return true;
