@@ -62,7 +62,7 @@ int CDeplacementDroite::getVoisin(int idx) {
 bool CDeplacementDroite::next(void) {
     if(idx - 1 >= 0) {
         idx--;
-        if(idx % COTE == COTE -1) {
+        if(idx % COTE == COTE - 1) {
             idx--;
         }
 
@@ -99,7 +99,7 @@ int CDeplacementGauche::getVoisin(int idx) {
 }
 //-----------------------------------------------------------------------------
 bool CDeplacementGauche::next(void) {
-    if(idx +1 < CASE) {
+    if(idx + 1 < CASE) {
         idx++;
         if(idx % COTE == 0) {
             idx++;
