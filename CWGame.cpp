@@ -49,7 +49,9 @@ void CWGame::calculFont(int valeur, int tailleMax) {
 }
 //-----------------------------------------------------------------------------
 CWGame::EResultat CWGame::joue(CDeplacement *dep) {
-    if(dep->deplacement(grille, score)) {
+    bool isMove = dep->deplacement(grille, score);
+
+    if(isMove) {
         if(!ajout()) {
             return gagne ? CWGame::erFin : CWGame::erPerdu;
         }
@@ -59,32 +61,7 @@ CWGame::EResultat CWGame::joue(CDeplacement *dep) {
         }
     }
 
-    return (perdu() ? (gagne ? CWGame::erFin : CWGame::erPerdu) : CWGame::erNone);
-}
-//-----------------------------------------------------------------------------
-bool CWGame::perdu(void) {
-    int i;
-
-    for(i=0;i<CASE;i++) {
-        if(grille[i].valeur == 0) {
-            return false;
-        }
-    }
-
-    for(i=0;i<CASE;i++) {
-        if(i / COTE != COTE - 1) {
-            if(grille[i].valeur == grille[i + COTE].valeur) {
-                return false;
-            }
-        }
-        if(i % COTE != COTE - 1) {
-            if(grille[i].valeur == grille[i + 1].valeur) {
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return (perdu() ? (gagne ? CWGame::erFin : CWGame::erPerdu) : isMove ? CWGame::erMove : CWGame::erNone);
 }
 //-----------------------------------------------------------------------------
 void CWGame::onTimer(void) {
@@ -155,14 +132,16 @@ void CWGame::resizeEvent(QResizeEvent *) {
     forceFont = true;
 }
 //-----------------------------------------------------------------------------
-CWGame::CWGame(QWidget *parent) : QWidget(parent) {
+CWGame::CWGame(QWidget *parent, bool initTimer) : QWidget(parent) {
     forceFont = false;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     step = 0;
 
-    srand(time(NULL));
-    nouveau(); 
+    if(initTimer) {
+        srand(time(NULL));
+    }
+    nouveau();
 
     timer->setInterval(DELAI);
     timer->start();
@@ -232,5 +211,34 @@ CWGame::EResultat CWGame::gauche(void) {
 //-----------------------------------------------------------------------------
 int CWGame::getScore(void) {
     return score;
+}
+//-----------------------------------------------------------------------------
+const TCases& CWGame::getCases(void) const {
+    return grille;
+}
+//-----------------------------------------------------------------------------
+bool CWGame::perdu(void) {
+    int i;
+
+    for(i=0;i<CASE;i++) {
+        if(grille[i].valeur == 0) {
+            return false;
+        }
+    }
+
+    for(i=0;i<CASE;i++) {
+        if(i / COTE != COTE - 1) {
+            if(grille[i].valeur == grille[i + COTE].valeur) {
+                return false;
+            }
+        }
+        if(i % COTE != COTE - 1) {
+            if(grille[i].valeur == grille[i + 1].valeur) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 //-----------------------------------------------------------------------------

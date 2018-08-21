@@ -60,6 +60,8 @@
     </property>
     <addaction name="actNouveauJeu"/>
     <addaction name="separator"/>
+    <addaction name="actResolution"/>
+    <addaction name="separator"/>
     <addaction name="actQuitter"/>
    </widget>
    <addaction name="mnuFichier"/>
@@ -72,6 +74,11 @@
   <action name="actQuitter">
    <property name="text">
     <string>&amp;Quiter</string>
+   </property>
+  </action>
+  <action name="actResolution">
+   <property name="text">
+    <string>Résolution</string>
    </property>
   </action>
  </widget>

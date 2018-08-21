@@ -28,16 +28,25 @@ SOURCES += \
         main.cpp \
         CMainWindow.cpp \
     CWGame.cpp \
-    CDeplacement.cpp
+    CDeplacement.cpp \
+    CResolutionDialog.cpp \
+    CGenetic.cpp \
+    CGamer.cpp \
+    CNeurone.cpp
 
 HEADERS += \
     CMainWindow.h \
     CWGame.h \
     CDeplacement.h \
-    common.h
+    common.h \
+    CResolutionDialog.h \
+    CGenetic.h \
+    CGamer.h \
+    CNeurone.h
 
 FORMS += \
-        CMainWindow.ui
+        CMainWindow.ui \
+    CResolutionDialog.ui
 
 RESOURCES += \
     2048.qrc

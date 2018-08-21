@@ -10,10 +10,10 @@
 class CWGame : public QWidget {
     Q_OBJECT
 public:
-    typedef enum { erNone, erGagne, erPerdu, erFin } EResultat;
+    typedef enum { erNone, erGagne, erPerdu, erFin, erMove } EResultat;
 private:
     int score;
-    SCase grille[CASE];
+    TCases grille;
     int fusion[CASE];
     bool forceFont;
     QFont font;
@@ -23,14 +23,13 @@ private:
 
     void calculFont(int valeur, int tailleMax);
     CWGame::EResultat joue(CDeplacement *dep);
-    bool perdu(void);
 private slots:
     void onTimer(void);
 protected:
     virtual void paintEvent(QPaintEvent *);
     virtual void resizeEvent(QResizeEvent *);
 public:
-    explicit CWGame(QWidget *parent = 0);
+    explicit CWGame(QWidget *parent = 0, bool initTimer = false);
     ~CWGame(void);
     bool ajout(void);
     void nouveau(void);
@@ -39,6 +38,8 @@ public:
     CWGame::EResultat bas(void);
     CWGame::EResultat gauche(void);
     int getScore(void);
+    const TCases& getCases(void) const;
+    bool perdu(void);
 };
 //-----------------------------------------------------------------------------
 #endif // __CWGAME_H__

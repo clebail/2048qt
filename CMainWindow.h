@@ -10,6 +10,7 @@ class CMainWindow : public QMainWindow, private Ui::CMainWindow {
 private slots:
     void on_actQuitter_triggered();
     void on_actNouveauJeu_triggered();
+    void on_actResolution_triggered();
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 public:

@@ -3,10 +3,13 @@
 #include <QtDebug>
 #include <QMessageBox>
 #include "CMainWindow.h"
-#include "ui_CMainWindow.h"
+#include "CResolutionDialog.h"
 //-----------------------------------------------------------------------------
 CMainWindow::CMainWindow(QWidget *parent) : QMainWindow(parent) {
+    srand(time(NULL));
+
     setupUi(this);
+
 
     installEventFilter(this);
     lblScore->setText("Score : "+QString::number(wGame->getScore()));
@@ -21,6 +24,12 @@ void CMainWindow::on_actNouveauJeu_triggered() {
         wGame->nouveau();
         lblScore->setText("Score : "+QString::number(wGame->getScore()));
     }
+}
+//-----------------------------------------------------------------------------
+void CMainWindow::on_actResolution_triggered() {
+    CResolutionDialog rd;
+
+    rd.exec();
 }
 //-----------------------------------------------------------------------------
 bool CMainWindow::eventFilter(QObject *obj, QEvent *event) {
