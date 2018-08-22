@@ -5,12 +5,15 @@
 #include "CGenetic.h"
 #include "ui_CResolutionDialog.h"
 
-#define NB_GAME             16
+#define NB_COLONNE          6
+#define NB_LIGNE            4
+#define NB_GAME             (NB_COLONNE*NB_LIGNE)
 
 class CResolutionDialog : public QDialog, private Ui::CResolutionDialog {
     Q_OBJECT
 public:
     explicit CResolutionDialog(QWidget *parent = 0);
+    ~CResolutionDialog(void);
 private:
     CWGame *games[NB_GAME];
     CGenetic *genetic;

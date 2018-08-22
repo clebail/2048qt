@@ -1,24 +1,29 @@
+#include <QtDebug>
 #include "CResolutionDialog.h"
 
 CResolutionDialog::CResolutionDialog(QWidget *parent) : QDialog(parent) {
+    int i;
+    int x, y;
+    QGridLayout *layout;
     setupUi(this);
 
-    games[0] = wg0;
-    games[1] = wg1;
-    games[2] = wg2;
-    games[3] = wg3;
-    games[4] = wg4;
-    games[5] = wg5;
-    games[6] = wg6;
-    games[7] = wg7;
-    games[8] = wg8;
-    games[9] = wg9;
-    games[10] = wg10;
-    games[11] = wg11;
-    games[12] = wg12;
-    games[13] = wg13;
-    games[14] = wg14;
-    games[15] = wg15;
+    layout = static_cast<QGridLayout *>(grid->layout());
+
+    for(y=i=0;y<NB_LIGNE;y++) {
+        for(x=0;x<NB_COLONNE;x++, i++) {
+            games[i] = new CWGame(this);
+
+            layout->addWidget(games[i], y, x);
+        }
+    }
+}
+
+CResolutionDialog::~CResolutionDialog(void) {
+    int i;
+
+    for(i=0;i<NB_GAME;i++) {
+        delete games[i];
+    }
 }
 
 void CResolutionDialog::on_pbGo_clicked(bool) {

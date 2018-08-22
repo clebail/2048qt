@@ -22,7 +22,7 @@ private:
     bool gagne;
 
     void calculFont(int valeur, int tailleMax);
-    CWGame::EResultat joue(CDeplacement *dep);
+    CWGame::EResultat joue(CDeplacement *dep, bool anim);
 private slots:
     void onTimer(void);
 protected:
@@ -31,12 +31,12 @@ protected:
 public:
     explicit CWGame(QWidget *parent = 0, bool initTimer = false);
     ~CWGame(void);
-    bool ajout(void);
-    void nouveau(void);
-    CWGame::EResultat haut(void);
-    CWGame::EResultat droite(void);
-    CWGame::EResultat bas(void);
-    CWGame::EResultat gauche(void);
+    bool ajout(bool anim=true);
+    void nouveau(bool anim=true);
+    CWGame::EResultat haut(bool anim=true);
+    CWGame::EResultat droite(bool anim=true);
+    CWGame::EResultat bas(bool anim=true);
+    CWGame::EResultat gauche(bool anim=true);
     int getScore(void);
     const TCases& getCases(void) const;
     bool perdu(void);

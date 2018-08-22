@@ -5,6 +5,21 @@ CGamer::CGamer(CWGame *game) {
 
     alive= true;
     gagne = false;
+
+    deps = new CDeplacement*[NB_NEURONE];
+    deps[0] = new CDeplacementHaut();
+    deps[1] = new CDeplacementDroite();
+    deps[2] = new CDeplacementBas();
+    deps[3] = new CDeplacementGauche();
+}
+
+CGamer::~CGamer(void) {
+    int i;
+    for(i=0;i<NB_NEURONE;i++) {
+        delete deps[i];
+    }
+
+    delete deps;
 }
 
 void CGamer::init(void) {
@@ -24,25 +39,31 @@ void CGamer::joue(const TCases& cases) {
 
     for(i=0;i<NB_NEURONE;i++) {
         values[i] = neurones[i].eval(cases);
-        if(idxMax == -1 || values[i] > max) {
-            max = values[i];
-            idxMax = i;
+        if(deps[i]->canGo(cases)) {
+            if(idxMax == -1 || values[i] > max) {
+                max = values[i];
+                idxMax = i;
+            }
         }
     }
 
     switch(idxMax) {
     case 0:
-        resultat = game->haut();
+        resultat = game->haut(false);
         break;
     case 1:
-        resultat = game->droite();
+        resultat = game->droite(false);
         break;
     case 2:
-        resultat = game->bas();
+        resultat = game->bas(false);
         break;
     case 3:
-        resultat = game->gauche();
+        resultat = game->gauche(false);
         break;
+    case -1:
+        alive = false;
+        score = 0;
+        return;
     }
 
     gagne = game->getScore() >= 2048;
@@ -58,9 +79,25 @@ bool CGamer::isAlive(void) const {
 }
 
 int CGamer::getScore(void) {
-    return game->getScore();
+    if(score == -1) {
+        score = game->getScore();
+    }
+    return score;
 }
 
 void CGamer::start(void) {
     alive = true;
+    score = -1;
+}
+
+void CGamer::from(CGamer *g1, CGamer *g2) {
+    int i;
+    for(i=0;i<NB_NEURONE;i++) {
+        int seuil = rand() % (CASE + 1);
+
+        neurones[i].from(g1->neurones[i], g2->neurones[i], seuil);
+        neurones[i].mute(rand() % (CASE + 1));
+    }
+
+    score = 0;
 }

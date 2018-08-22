@@ -12,7 +12,8 @@ protected:
     virtual bool next(void) = 0;
     virtual void init(void) = 0;
 public:
-    bool deplacement(SCase *grille, int &score);
+    bool deplacement(SCase *grille, int &score, bool anim = true);
+    bool canGo(const TCases& cases);
     virtual ~CDeplacement(void) {}
 };
 //-----------------------------------------------------------------------------

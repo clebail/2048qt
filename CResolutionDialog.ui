@@ -11,67 +11,18 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Résolution</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="grid" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="1">
-       <widget class="CWGame" name="wg9" native="true"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="CWGame" name="wg8" native="true"/>
-      </item>
-      <item row="2" column="3">
-       <widget class="CWGame" name="wg11" native="true"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="CWGame" name="wg0" native="true"/>
-      </item>
-      <item row="0" column="3">
-       <widget class="CWGame" name="wg3" native="true"/>
-      </item>
-      <item row="1" column="3">
-       <widget class="CWGame" name="wg7" native="true"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="CWGame" name="wg4" native="true"/>
-      </item>
-      <item row="2" column="2">
-       <widget class="CWGame" name="wg10" native="true"/>
-      </item>
-      <item row="0" column="2">
-       <widget class="CWGame" name="wg2" native="true"/>
-      </item>
-      <item row="0" column="1">
-       <widget class="CWGame" name="wg1" native="true"/>
-      </item>
-      <item row="1" column="2">
-       <widget class="CWGame" name="wg6" native="true"/>
-      </item>
-      <item row="1" column="1">
-       <widget class="CWGame" name="wg5" native="true"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="CWGame" name="wg12" native="true"/>
-      </item>
-      <item row="3" column="1">
-       <widget class="CWGame" name="wg13" native="true"/>
-      </item>
-      <item row="3" column="2">
-       <widget class="CWGame" name="wg14" native="true"/>
-      </item>
-      <item row="3" column="3">
-       <widget class="CWGame" name="wg15" native="true"/>
-      </item>
-     </layout>
+     <layout class="QGridLayout" name="gridLayout"/>
     </widget>
    </item>
    <item>
@@ -117,14 +68,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CWGame</class>
-   <extends>QWidget</extends>
-   <header>CWGame.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

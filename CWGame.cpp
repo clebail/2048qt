@@ -43,16 +43,20 @@ void CWGame::calculFont(int valeur, int tailleMax) {
             fontSize--;
         }while((largeur > tailleMax || hauteur > tailleMax) && fontSize > 1);
 
+        if(fontSize < 1) {
+            fontSize = 1;
+        }
+
         oldValeur = valeur;
         forceFont = false;
     }
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::joue(CDeplacement *dep) {
-    bool isMove = dep->deplacement(grille, score);
+CWGame::EResultat CWGame::joue(CDeplacement *dep, bool anim) {
+    bool isMove = dep->deplacement(grille, score, anim);
 
     if(isMove) {
-        if(!ajout()) {
+        if(!ajout(anim)) {
             return gagne ? CWGame::erFin : CWGame::erPerdu;
         }
         if(score == 2048) {
@@ -151,7 +155,7 @@ CWGame::~CWGame(void) {
     delete timer;
 }
 //-----------------------------------------------------------------------------
-bool CWGame::ajout(void) {
+bool CWGame::ajout(bool anim) {
     int nbVide = 0;
     int vides[CASE];
     int i, j;
@@ -166,7 +170,9 @@ bool CWGame::ajout(void) {
     if(nbVide != 0) {
         int idx = vides[rand() % nbVide];
         grille[idx].valeur = 2 * (rand() % 2 + 1);
-        grille[idx].nouveau = true;
+        if(anim) {
+            grille[idx].nouveau = true;
+        }
         score = qMax(score, grille[idx].valeur);
         step = 0;
 
@@ -176,37 +182,37 @@ bool CWGame::ajout(void) {
     return false;
 }
 //-----------------------------------------------------------------------------
-void CWGame::nouveau(void) {
+void CWGame::nouveau(bool anim) {
     score = 0;
     gagne = false;
     memset(grille, 0, CASE * sizeof(SCase));
 
-    ajout();
-    ajout();
+    ajout(anim);
+    ajout(anim);
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::haut(void) {
+CWGame::EResultat CWGame::haut(bool anim) {
     CDeplacementHaut dep;
 
-    return joue(&dep);
+    return joue(&dep, anim);
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::droite(void) {
+CWGame::EResultat CWGame::droite(bool anim) {
     CDeplacementDroite dep;
 
-    return joue(&dep);
+    return joue(&dep, anim);
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::bas(void) {
+CWGame::EResultat CWGame::bas(bool anim) {
     CDeplacementBas dep;
 
-    return joue(&dep);
+    return joue(&dep, anim);
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::gauche(void) {
+CWGame::EResultat CWGame::gauche(bool anim) {
     CDeplacementGauche dep;
 
-    return joue(&dep);
+    return joue(&dep, anim);
 }
 //-----------------------------------------------------------------------------
 int CWGame::getScore(void) {

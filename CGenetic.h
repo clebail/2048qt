@@ -17,6 +17,7 @@ private:
     QList<CGamer *> gamers;
 
     void croise(void);
+    void croiseGamers(int i1, int i2, int ir);
 };
 
 #endif // CGENETIC_H
