@@ -3,14 +3,16 @@
 
 #include "common.h"
 
+#define NB_GENE         25
+
 class CNeurone {
 public:
     void init(void);
-    int eval(const TCases& cases) const;
+    int eval(int * inputs) const;
     void from(const CNeurone& n1, const CNeurone& n2, int seuil);
     void mute(int idx);
 private:
-    double genes[CASE+1];
+    double genes[NB_GENE];
 
     void initGene(int idx);
 };

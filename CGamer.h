@@ -11,7 +11,7 @@ public:
     CGamer(CWGame *game);
     ~CGamer(void);
     void init(void);
-    void joue(const TCases& cases);
+    void joue(void);
     bool isGagne(void) const;
     bool isAlive(void) const;
     int getScore(void);
@@ -24,6 +24,7 @@ private:
     bool gagne;
     bool alive;
     int score;
+    int nbCoup;
 };
 
 #endif // CGAMER_H

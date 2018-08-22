@@ -44,7 +44,7 @@ void CGenetic::run(void) {
 
             for(i=0;i<nbGame;i++) {
                 if(gamers.at(i)->isAlive()) {
-                    gamers.at(i)->joue(games[i]->getCases());
+                    gamers.at(i)->joue();
 
                     if(!gamers.at(i)->isAlive()) {
                         nbAlive--;

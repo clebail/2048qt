@@ -40,6 +40,11 @@ public:
     int getScore(void);
     const TCases& getCases(void) const;
     bool perdu(void);
+    int getColonneMax(int colIdx);
+    int getLigneMax(int ligIdx);
+    int getColonneMaxApres(int colIdx, int sens);
+    int getLigneMaxApres(int ligIdx, int sens);
+    int getSomme(void);
 };
 //-----------------------------------------------------------------------------
 #endif // __CWGAME_H__
