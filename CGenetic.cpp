@@ -1,4 +1,5 @@
 #include <QtDebug>
+#include <QTime>
 #include "CGenetic.h"
 
 bool lessThan(CGamer *g1, CGamer *g2) {
@@ -30,17 +31,20 @@ void CGenetic::run(void) {
     int i;
     int nbAlive = nbGame;
     bool fini = false;
+    int nb2048 = 0;
+    QTime time;
 
+    time.start();
     while(!fini) {
         nbAlive = nbGame;
+        int value = games[0]->genValue();
 
         for(i=0;i<nbGame;i++) {
-            games[i]->nouveau(false);
-            gamers.at(i)->start();
+            gamers.at(i)->start(value);
         }
 
         while(nbAlive != 0) {
-            usleep(100);
+            msleep(200);
 
             for(i=0;i<nbGame;i++) {
                 if(gamers.at(i)->isAlive()) {
@@ -55,13 +59,22 @@ void CGenetic::run(void) {
 
         qSort(gamers.begin(), gamers.end(), lessThan);
 
-        qDebug() << "Max score" << gamers.at(0)->getScore();
+        qDebug() << "Max score" << gamers.at(0)->getScore() << gamers.at(0)->get2048Score();
 
-        fini = gamers.at(0)->isGagne();
+        if(gamers.at(0)->isGagne()) {
+            nb2048++;
+        }else {
+            nb2048 = 0;
+        }
+
+        fini = (nb2048 == 10);
+
         if(!fini) {
             croise();
         }
     }
+
+    qDebug() << time.fromString("hh:mm:ss");
 }
 
 void CGenetic::croise(void) {
@@ -72,14 +85,22 @@ void CGenetic::croise(void) {
     max = nbGame / 2;
 
     while(i < max) {
-        croiseGamers(i-1, i, ir);
-        croiseGamers(i, i-1, ir-1);
+        if(gamers.at(i-1)->getScore() > 0 && gamers.at(i)->getScore() > 0) {
+            croiseGamers(i-1, i, ir);
+            croiseGamers(i, i-1, ir-1);
 
-        i+=2;
-        ir-=2;
+            i+=2;
+            ir-=2;
+        } else {
+            i -= (gamers.at(i-1)->getScore() <= 0 ? 1 : 0);
+            for(;i<ir;i++) {
+                gamers.at(i)->init();
+            }
+        }
     }
 }
 
 void CGenetic::croiseGamers(int i1, int i2, int ir) {
     gamers.at(ir)->from(gamers.at(i1),  gamers.at(i2));
 }
+

@@ -23,6 +23,8 @@ private:
 
     void calculFont(int valeur, int tailleMax);
     CWGame::EResultat joue(CDeplacement *dep, bool anim);
+    void decodeValue(int& x, int& y, int& valeur, int value);
+    int encodeValue(int x, int y, int value);
 private slots:
     void onTimer(void);
 protected:
@@ -32,7 +34,7 @@ public:
     explicit CWGame(QWidget *parent = 0, bool initTimer = false);
     ~CWGame(void);
     bool ajout(bool anim=true);
-    void nouveau(bool anim=true);
+    void nouveau(bool anim=true, int *value=0);
     CWGame::EResultat haut(bool anim=true);
     CWGame::EResultat droite(bool anim=true);
     CWGame::EResultat bas(bool anim=true);
@@ -45,6 +47,7 @@ public:
     int getColonneMaxApres(int colIdx, int sens);
     int getLigneMaxApres(int ligIdx, int sens);
     int getSomme(void);
+    int genValue(void);
 };
 //-----------------------------------------------------------------------------
 #endif // __CWGAME_H__

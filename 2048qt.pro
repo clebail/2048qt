@@ -32,7 +32,8 @@ SOURCES += \
     CResolutionDialog.cpp \
     CGenetic.cpp \
     CGamer.cpp \
-    CNeurone.cpp
+    CNeurone.cpp \
+    CPerceptron.cpp
 
 HEADERS += \
     CMainWindow.h \
@@ -42,7 +43,8 @@ HEADERS += \
     CResolutionDialog.h \
     CGenetic.h \
     CGamer.h \
-    CNeurone.h
+    CNeurone.h \
+    CPerceptron.h
 
 FORMS += \
         CMainWindow.ui \

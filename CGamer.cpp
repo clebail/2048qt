@@ -1,72 +1,93 @@
+#include <QtDebug>
 #include "CGamer.h"
 
+#define NB_INPUT                12
+#define NB_INPUT_NEURONE        2
+#define NB_OUTPUT_NEURONE       4
+
 CGamer::CGamer(CWGame *game) {
+    QList<int> layer1Inputs;
+    int i;
+
     this->game = game;
 
     alive= true;
     gagne = false;
 
-    deps = new CDeplacement*[NB_NEURONE];
+    deps = new CDeplacement*[NB_OUTPUT_NEURONE];
     deps[0] = new CDeplacementHaut();
     deps[1] = new CDeplacementDroite();
     deps[2] = new CDeplacementBas();
     deps[3] = new CDeplacementGauche();
+
+    for(i=0;i<NB_INPUT_NEURONE;i++) {
+        layer1Inputs << NB_INPUT;
+    }
+
+    perceptron = new CPerceptron(layer1Inputs, NB_INPUT_NEURONE);
+
+    perceptron->addLayer(6);
+    perceptron->addLayer(NB_OUTPUT_NEURONE);
 }
 
 CGamer::~CGamer(void) {
     int i;
-    for(i=0;i<NB_NEURONE;i++) {
+    for(i=0;i<NB_OUTPUT_NEURONE;i++) {
         delete deps[i];
     }
 
     delete deps;
+    delete perceptron;
 }
 
 void CGamer::init(void) {
-    int i;
-
-    for(i=0;i<NB_NEURONE;i++) {
-        neurones[i].init();
-    }
+    perceptron->init();
 }
 
 void CGamer::joue(void) {
-    int values[NB_NEURONE];
     int max = 0;
     int idxMax = -1;
     int i;
-    int inputs[NB_GENE-1];
+    QList<QList<double> > inputs;
+    QList<double> in[NB_INPUT_NEURONE];
+    QList<double> values;
 
-    inputs[0] = game->getColonneMax(0);
-    inputs[1] = game->getColonneMax(1);
-    inputs[2] = game->getColonneMax(2);
-    inputs[3] = game->getColonneMax(3);
-    inputs[4] = game->getLigneMax(0);
-    inputs[5] = game->getLigneMax(1);
-    inputs[6] = game->getLigneMax(2);
-    inputs[7] = game->getLigneMax(3);
-    inputs[8] = game->getColonneMaxApres(0, 1);
-    inputs[9] = game->getColonneMaxApres(1, 1);
-    inputs[10] = game->getColonneMaxApres(2, 1);
-    inputs[11] = game->getColonneMaxApres(3, 1);
-    inputs[12] = game->getColonneMaxApres(0, -1);
-    inputs[13] = game->getColonneMaxApres(1, -1);
-    inputs[14] = game->getColonneMaxApres(2, -1);
-    inputs[15] = game->getColonneMaxApres(3, -1);
-    inputs[16] = game->getLigneMaxApres(0, 1);
-    inputs[17] = game->getLigneMaxApres(1, 1);
-    inputs[18] = game->getLigneMaxApres(2, 1);
-    inputs[19] = game->getLigneMaxApres(3, 1);
-    inputs[20] = game->getLigneMaxApres(0, -1);
-    inputs[21] = game->getLigneMaxApres(1, -1);
-    inputs[22] = game->getLigneMaxApres(2, -1);
-    inputs[23] = game->getLigneMaxApres(3, -1);
+    in[0] << (double)game->getColonneMax(0);
+    in[0] << (double)game->getColonneMaxApres(0, 1);
+    in[0] << (double)game->getColonneMaxApres(0, -1);
+    in[0] << (double)game->getColonneMax(1);
+    in[0] << (double)game->getColonneMaxApres(1, 1);
+    in[0] << (double)game->getColonneMaxApres(1, -1);
+    in[0] << (double)game->getColonneMax(2);
+    in[0] << (double)game->getColonneMaxApres(2, 1);
+    in[0] << (double)game->getColonneMaxApres(2, -1);
+    in[0] << (double)game->getColonneMax(3);
+    in[0] << (double)game->getColonneMaxApres(3, 1);
+    in[0] << (double)game->getColonneMaxApres(3, -1);
 
-    for(i=0;i<NB_NEURONE;i++) {
-        values[i] = neurones[i].eval(inputs);
-        if(deps[i]->canGo(game->getCases())) {
-            if(idxMax == -1 || values[i] > max) {
-                max = values[i];
+    in[1] << (double)game->getLigneMax(0);
+    in[1] << (double)game->getLigneMaxApres(0, 1);
+    in[1] << (double)game->getLigneMaxApres(0, -1);
+    in[1] << (double)game->getLigneMax(1);
+    in[1] << (double)game->getLigneMaxApres(1, 1);
+    in[1] << (double)game->getLigneMaxApres(1, -1);
+    in[1] << (double)game->getLigneMax(2);
+    in[1] << (double)game->getLigneMaxApres(2, 1);
+    in[1] << (double)game->getLigneMaxApres(2, -1);
+    in[1] << (double)game->getLigneMax(3);
+    in[1] << (double)game->getLigneMaxApres(3, 1);
+    in[1] << (double)game->getLigneMaxApres(3, -1);
+
+    for(i=0;i<NB_INPUT_NEURONE;i++) {
+        inputs << in[i];
+    }
+
+    values = perceptron->eval(inputs);
+
+    for(i=0;i<NB_OUTPUT_NEURONE;i++) {
+        if(deps[i]->canGo(game->getCases()) && values.at(i) != 0.0) {
+            if(idxMax == -1 || values.at(i) > max) {
+                max = values.at(i);
                 idxMax = i;
             }
         }
@@ -87,7 +108,7 @@ void CGamer::joue(void) {
         break;
     case -1:
         alive = false;
-        score = 0;
+        //score = 0;
         return;
     }
 
@@ -106,23 +127,22 @@ bool CGamer::isAlive(void) const {
 
 int CGamer::getScore(void) {
     if(score == -1) {
-        score = game->getSomme();
+        score = game->getScore() * 10 + game->getSomme();
     }
     return score;
 }
 
-void CGamer::start(void) {
+int CGamer::get2048Score(void) {
+    return game->getScore();
+}
+
+void CGamer::start(int value) {
     alive = true;
     score = -1;
     nbCoup = 0;
+    game->nouveau(false, &value);
 }
 
 void CGamer::from(CGamer *g1, CGamer *g2) {
-    int i;
-    for(i=0;i<NB_NEURONE;i++) {
-        int seuil = rand() % NB_GENE;
-
-        neurones[i].from(g1->neurones[i], g2->neurones[i], seuil);
-        neurones[i].mute(rand() % NB_GENE);
-    }
+    perceptron->from(g1->perceptron, g2->perceptron);
 }

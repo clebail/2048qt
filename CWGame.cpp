@@ -68,6 +68,16 @@ CWGame::EResultat CWGame::joue(CDeplacement *dep, bool anim) {
     return (perdu() ? (gagne ? CWGame::erFin : CWGame::erPerdu) : isMove ? CWGame::erMove : CWGame::erNone);
 }
 //-----------------------------------------------------------------------------
+void CWGame::decodeValue(int& x, int& y, int& valeur, int value) {
+    valeur = value & 0x0000000F;
+    x = (value & 0x000000C0) >> 6;
+    y = (value & 0x00000030) >> 4;
+}
+//-----------------------------------------------------------------------------
+int CWGame::encodeValue(int x, int y, int value) {
+    return ((x & 0x00000003) << 6) | ((y & 0x00000003) << 4) | (value & 0x0000000F);
+}
+//-----------------------------------------------------------------------------
 void CWGame::onTimer(void) {
     step++;
 
@@ -182,13 +192,23 @@ bool CWGame::ajout(bool anim) {
     return false;
 }
 //-----------------------------------------------------------------------------
-void CWGame::nouveau(bool anim) {
+void CWGame::nouveau(bool anim, int *value) {
     score = 0;
     gagne = false;
     memset(grille, 0, CASE * sizeof(SCase));
 
-    ajout(anim);
-    ajout(anim);
+    if(value == 0) {
+        ajout(anim);
+        ajout(anim);
+    } else {
+        int x, y, valeur;
+
+        decodeValue(x, y, valeur, *value & 0x000000FF);
+        grille[y*COTE+x].valeur = valeur;
+
+        decodeValue(x, y, valeur, (*value & 0x0000FF00) >> 8);
+        grille[y*COTE+x].valeur = valeur;
+    }
 }
 //-----------------------------------------------------------------------------
 CWGame::EResultat CWGame::haut(bool anim) {
@@ -309,5 +329,31 @@ int CWGame::getSomme(void) {
     }
 
     return s;
+}
+//-----------------------------------------------------------------------------
+int CWGame::genValue(void) {
+    int vides[CASE];
+    int i, j, k;
+    TCases grille;
+    int value = 0;
+
+    memset(grille, 0, CASE * sizeof(SCase));
+
+    for(k=0;k<2;k++) {
+        int idx;
+        for(i=j=0;i<CASE;i++) {
+            if(grille[i].valeur == 0) {
+                vides[j++] = i;
+            }
+        }
+
+        idx = vides[rand() % (CASE - k)];
+        grille[idx].valeur = 2 * (rand() % 2 + 1);
+
+        value <<= 8;
+        value |= encodeValue(idx % COTE, idx / COTE, grille[idx].valeur);
+    }
+
+    return value;
 }
 //-----------------------------------------------------------------------------
