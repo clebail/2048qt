@@ -86,6 +86,8 @@ void CGamer::joue(void) {
     }
 
     values = perceptron->eval(inputs);
+	
+	//qDebug() << in[0] << in[1] << in[2] << in[3] << values;
 
     max = 0;
     for(i=0;i<NB_OUTPUT_NEURONE;i++) {
