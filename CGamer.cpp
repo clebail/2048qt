@@ -1,7 +1,7 @@
 #include <QtDebug>
 #include "CGamer.h"
 
-#define NB_INPUT                5
+#define NB_INPUT                4
 #define NB_INPUT_NEURONE        4
 #define NB_OUTPUT_NEURONE       4
 
@@ -54,35 +54,31 @@ void CGamer::joue(void) {
     QList<double> in[NB_INPUT_NEURONE];
     QList<double> values;
 
-    game->getColResultatApres(1, max, nbFusion, nbVide);
+    analyse(deps[0], max, nbFusion, nbVide);
     in[0] << (double)game->getScore();
-    in[0] << (double)game->getColMax();
     in[0] << (double)max;
     in[0] << (double)nbFusion;
     in[0] << (double)nbVide;
 
-    game->getColResultatApres(-1, max, nbFusion, nbVide);
+    analyse(deps[1], max, nbFusion, nbVide);
     in[1] << (double)game->getScore();
-    in[1] << (double)game->getColMax();
     in[1] << (double)max;
     in[1] << (double)nbFusion;
     in[1] << (double)nbVide;
 
-    game->getLigResultatApres(1, max, nbFusion, nbVide);
+    analyse(deps[2], max, nbFusion, nbVide);
     in[2] << (double)game->getScore();
-    in[2] << (double)game->getLigMax();
     in[2] << (double)max;
     in[2] << (double)nbFusion;
     in[2] << (double)nbVide;
 
-    game->getLigResultatApres(-1, max, nbFusion, nbVide);
+    analyse(deps[3], max, nbFusion, nbVide);
     in[3] << (double)game->getScore();
-    in[3] << (double)game->getLigMax();
     in[3] << (double)max;
     in[3] << (double)nbFusion;
     in[3] << (double)nbVide;
 
-    qDebug() << in[0] << in[1] << in[2] << in[3];
+    //qDebug() << in[0] << in[1] << in[2] << in[3];
 
 
     for(i=0;i<NB_INPUT_NEURONE;i++) {
@@ -153,4 +149,24 @@ void CGamer::start(int value) {
 
 void CGamer::from(CGamer *g1, CGamer *g2) {
     perceptron->from(g1->perceptron, g2->perceptron);
+}
+
+void CGamer::analyse(CDeplacement *dep, int& max, int& nbFusion, int& nbVide) {
+    TCases grille;
+    int i;
+
+    memcpy(grille, game->getCases(), CASE * sizeof(SCase));
+
+    dep->deplacement(grille, max, true);
+
+    nbFusion = 0;
+    nbVide = 0;
+
+    for(i=0;i<CASE;i++) {
+        if(grille[i].fusion) {
+            nbFusion++;
+        } else if(grille[i].valeur == 0) {
+            nbVide++;
+        }
+    }
 }

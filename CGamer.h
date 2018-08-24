@@ -24,6 +24,8 @@ private:
     bool alive;
     int score;
     int nbCoup;
+
+    void analyse(CDeplacement *dep, int& max, int& nbFusion, int& nbVide);
 };
 
 #endif // CGAMER_H

@@ -44,7 +44,7 @@ void CGenetic::run(void) {
         }
 
         while(nbAlive != 0) {
-            sleep(2);
+            usleep(100);
 
             for(i=0;i<nbGame;i++) {
                 if(gamers.at(i)->isAlive()) {
