@@ -1,8 +1,8 @@
 #include <QtDebug>
 #include "CGamer.h"
 
-#define NB_INPUT                12
-#define NB_INPUT_NEURONE        2
+#define NB_INPUT                5
+#define NB_INPUT_NEURONE        4
 #define NB_OUTPUT_NEURONE       4
 
 CGamer::CGamer(CWGame *game) {
@@ -46,37 +46,44 @@ void CGamer::init(void) {
 
 void CGamer::joue(void) {
     int max = 0;
+    int nbFusion;
+    int nbVide;
     int idxMax = -1;
     int i;
     QList<QList<double> > inputs;
     QList<double> in[NB_INPUT_NEURONE];
     QList<double> values;
 
-    in[0] << (double)game->getColonneMax(0);
-    in[0] << (double)game->getColonneMaxApres(0, 1);
-    in[0] << (double)game->getColonneMaxApres(0, -1);
-    in[0] << (double)game->getColonneMax(1);
-    in[0] << (double)game->getColonneMaxApres(1, 1);
-    in[0] << (double)game->getColonneMaxApres(1, -1);
-    in[0] << (double)game->getColonneMax(2);
-    in[0] << (double)game->getColonneMaxApres(2, 1);
-    in[0] << (double)game->getColonneMaxApres(2, -1);
-    in[0] << (double)game->getColonneMax(3);
-    in[0] << (double)game->getColonneMaxApres(3, 1);
-    in[0] << (double)game->getColonneMaxApres(3, -1);
+    game->getColResultatApres(1, max, nbFusion, nbVide);
+    in[0] << (double)game->getScore();
+    in[0] << (double)game->getColMax();
+    in[0] << (double)max;
+    in[0] << (double)nbFusion;
+    in[0] << (double)nbVide;
 
-    in[1] << (double)game->getLigneMax(0);
-    in[1] << (double)game->getLigneMaxApres(0, 1);
-    in[1] << (double)game->getLigneMaxApres(0, -1);
-    in[1] << (double)game->getLigneMax(1);
-    in[1] << (double)game->getLigneMaxApres(1, 1);
-    in[1] << (double)game->getLigneMaxApres(1, -1);
-    in[1] << (double)game->getLigneMax(2);
-    in[1] << (double)game->getLigneMaxApres(2, 1);
-    in[1] << (double)game->getLigneMaxApres(2, -1);
-    in[1] << (double)game->getLigneMax(3);
-    in[1] << (double)game->getLigneMaxApres(3, 1);
-    in[1] << (double)game->getLigneMaxApres(3, -1);
+    game->getColResultatApres(-1, max, nbFusion, nbVide);
+    in[1] << (double)game->getScore();
+    in[1] << (double)game->getColMax();
+    in[1] << (double)max;
+    in[1] << (double)nbFusion;
+    in[1] << (double)nbVide;
+
+    game->getLigResultatApres(1, max, nbFusion, nbVide);
+    in[2] << (double)game->getScore();
+    in[2] << (double)game->getLigMax();
+    in[2] << (double)max;
+    in[2] << (double)nbFusion;
+    in[2] << (double)nbVide;
+
+    game->getLigResultatApres(-1, max, nbFusion, nbVide);
+    in[3] << (double)game->getScore();
+    in[3] << (double)game->getLigMax();
+    in[3] << (double)max;
+    in[3] << (double)nbFusion;
+    in[3] << (double)nbVide;
+
+    qDebug() << in[0] << in[1] << in[2] << in[3];
+
 
     for(i=0;i<NB_INPUT_NEURONE;i++) {
         inputs << in[i];
@@ -84,6 +91,7 @@ void CGamer::joue(void) {
 
     values = perceptron->eval(inputs);
 
+    max = 0;
     for(i=0;i<NB_OUTPUT_NEURONE;i++) {
         if(deps[i]->canGo(game->getCases()) && values.at(i) != 0.0) {
             if(idxMax == -1 || values.at(i) > max) {

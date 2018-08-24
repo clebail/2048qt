@@ -78,6 +78,78 @@ int CWGame::encodeValue(int x, int y, int value) {
     return ((x & 0x00000003) << 6) | ((y & 0x00000003) << 4) | (value & 0x0000000F);
 }
 //-----------------------------------------------------------------------------
+int CWGame::getColonneMax(int colIdx) {
+    int i, c;
+    int m = 0;
+
+    for(i=0,c=colIdx;i<COTE;i++,c+=COTE) {
+        m = qMax(m, grille[c].valeur);
+    }
+
+    return m;
+}
+//-----------------------------------------------------------------------------
+int CWGame::getLigneMax(int ligIdx) {
+    int i, l;
+    int m = 0;
+
+    for(i=0,l=ligIdx*COTE;i<COTE;i++,l++) {
+        m = qMax(m, grille[l].valeur);
+    }
+
+    return m;
+}
+//-----------------------------------------------------------------------------
+void CWGame:: getColonneResultatApres(int colIdx, int sens, int& max, int& nbFusion, int& nbVide) {
+    int i, c;
+    int mc = 0;
+    int step = COTE * sens;
+
+    max = 0;
+    nbFusion = 0;
+    nbVide = COTE;
+
+    c = (COTE * (COTE - 1) * (-0.5 * sens + 0.5)) + colIdx;
+    for(i=0;i<COTE-1;i++,c+=step) {
+        if(grille[c].valeur != 0) {
+            nbVide--;
+            mc = qMax(mc, grille[c].valeur);
+            if(grille[c+step].valeur == grille[c].valeur) {
+                nbFusion++;
+                max = qMax(max, grille[c].valeur * 2);
+                c+=step;
+            }
+        }
+    }
+
+    max = qMax(max, mc);
+}
+//-----------------------------------------------------------------------------
+void CWGame::getLigneResultatApres(int ligIdx, int sens, int& max, int& nbFusion, int& nbVide) {
+    int i, l;
+    int ml = 0;
+    int step = sens;
+
+    max = 0;
+    nbFusion = 0;
+    nbVide = COTE;
+
+    l = COTE * ligIdx + (-0.5 * sens + 0.5) * (COTE - 1);
+    for(i=0;i<COTE-1;i++,l+=step) {
+        if(grille[l].valeur != 0) {
+            nbVide--;
+            ml = qMax(ml, grille[l].valeur);
+            if(grille[l+step].valeur == grille[l].valeur) {
+                nbFusion++;
+                max = qMax(max, grille[l].valeur * 2);
+                l+=step;
+            }
+        }
+    }
+
+    max = qMax(max, ml);
+}
+//-----------------------------------------------------------------------------
 void CWGame::onTimer(void) {
     step++;
 
@@ -268,58 +340,6 @@ bool CWGame::perdu(void) {
     return true;
 }
 //-----------------------------------------------------------------------------
-int CWGame::getColonneMax(int colIdx) {
-    int i, c;
-    int m = 0;
-
-    for(i=0,c=colIdx;i<COTE;i++,c+=COTE) {
-        m = qMax(m, grille[c].valeur);
-    }
-
-    return m;
-}
-//-----------------------------------------------------------------------------
-int CWGame::getLigneMax(int ligIdx) {
-    int i, l;
-    int m = 0;
-
-    for(i=0,l=ligIdx*COTE;i<COTE;i++,l++) {
-        m = qMax(m, grille[l].valeur);
-    }
-
-    return m;
-}
-//-----------------------------------------------------------------------------
-int CWGame::getColonneMaxApres(int colIdx, int sens) {
-    int i, c;
-    int m = 0;
-    int step = COTE * sens;
-
-    c = (COTE * (COTE - 1) * (-0.5 * sens + 0.5)) + colIdx;
-    for(i=0;i<COTE-1;i++,c+=step) {
-        if(grille[c].valeur != 0 && grille[c+step].valeur == grille[c].valeur) {
-            m = qMax(m, grille[c].valeur * 2);
-        }
-    }
-
-    return m;
-}
-//-----------------------------------------------------------------------------
-int CWGame::getLigneMaxApres(int ligIdx, int sens) {
-    int i, l;
-    int m = 0;
-    int step = sens;
-
-    l = COTE * ligIdx + (-0.5 * sens + 0.5) * (COTE - 1);
-    for(i=0;i<COTE-1;i++,l+=step) {
-        if(grille[l].valeur != 0 && grille[l+step].valeur == grille[l].valeur) {
-            m = qMax(m, grille[l].valeur * 2);
-        }
-    }
-
-    return m;
-}
-//-----------------------------------------------------------------------------
 int CWGame::getSomme(void) {
     int i;
     int s = 0;
@@ -355,5 +375,59 @@ int CWGame::genValue(void) {
     }
 
     return value;
+}
+//-----------------------------------------------------------------------------
+int CWGame::getColMax(void) {
+    int m=0;
+    int i;
+
+    for(i=0;i<COTE;i++) {
+        m = qMax(getColonneMax(i), m);
+    }
+
+    return m;
+}
+//-----------------------------------------------------------------------------
+int CWGame::getLigMax(void) {
+    int m=0;
+    int i;
+
+    for(i=0;i<COTE;i++) {
+        m = qMax(getLigneMax(i), m);
+    }
+
+    return m;
+}
+//-----------------------------------------------------------------------------
+void CWGame::getColResultatApres(int sens, int& max, int& nbFusion, int& nbVide) {
+    int i;
+
+    max = 0;
+    nbFusion = 0;
+    nbVide = 0;
+    for(i=0;i<COTE;i++) {
+        int cMax, cNbFusion, cNbVide;
+
+        getColonneResultatApres(i, sens, cMax, cNbFusion, cNbVide);
+        max = qMax(cMax, max);
+        nbFusion += cNbFusion;
+        nbVide += cNbVide;
+    }
+}
+//-----------------------------------------------------------------------------
+void CWGame::getLigResultatApres(int sens, int& max, int& nbFusion, int& nbVide) {
+    int i;
+
+    max = 0;
+    nbFusion = 0;
+    nbVide = 0;
+    for(i=0;i<COTE;i++) {
+        int lMax, lNbFusion, lNbVide;
+
+        getLigneResultatApres(i, sens, lMax, lNbFusion, lNbVide);
+        max = qMax(lMax, max);
+        nbFusion += lNbFusion;
+        nbVide += lNbVide;
+    }
 }
 //-----------------------------------------------------------------------------

@@ -44,7 +44,7 @@ void CGenetic::run(void) {
         }
 
         while(nbAlive != 0) {
-            msleep(200);
+            sleep(2);
 
             for(i=0;i<nbGame;i++) {
                 if(gamers.at(i)->isAlive()) {
@@ -85,18 +85,11 @@ void CGenetic::croise(void) {
     max = nbGame / 2;
 
     while(i < max) {
-        if(gamers.at(i-1)->getScore() > 0 && gamers.at(i)->getScore() > 0) {
-            croiseGamers(i-1, i, ir);
-            croiseGamers(i, i-1, ir-1);
+        croiseGamers(i-1, i, ir);
+        croiseGamers(i, i-1, ir-1);
 
-            i+=2;
-            ir-=2;
-        } else {
-            i -= (gamers.at(i-1)->getScore() <= 0 ? 1 : 0);
-            for(;i<ir;i++) {
-                gamers.at(i)->init();
-            }
-        }
+        i+=2;
+        ir-=2;
     }
 }
 

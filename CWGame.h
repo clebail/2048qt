@@ -25,6 +25,10 @@ private:
     CWGame::EResultat joue(CDeplacement *dep, bool anim);
     void decodeValue(int& x, int& y, int& valeur, int value);
     int encodeValue(int x, int y, int value);
+    int getColonneMax(int colIdx);
+    int getLigneMax(int ligIdx);
+    void getColonneResultatApres(int colIdx, int sens, int& max, int& nbFusion, int& nbVide);
+    void getLigneResultatApres(int ligIdx, int sens, int& max, int& nbFusion, int& nbVide);
 private slots:
     void onTimer(void);
 protected:
@@ -42,12 +46,12 @@ public:
     int getScore(void);
     const TCases& getCases(void) const;
     bool perdu(void);
-    int getColonneMax(int colIdx);
-    int getLigneMax(int ligIdx);
-    int getColonneMaxApres(int colIdx, int sens);
-    int getLigneMaxApres(int ligIdx, int sens);
     int getSomme(void);
     int genValue(void);
+    int getColMax(void);
+    int getLigMax(void);
+    void getColResultatApres(int sens, int& max, int& nbFusion, int& nbVide);
+    void getLigResultatApres(int sens, int& max, int& nbFusion, int& nbVide);
 };
 //-----------------------------------------------------------------------------
 #endif // __CWGAME_H__
