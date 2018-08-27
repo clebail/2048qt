@@ -1,7 +1,7 @@
 #include <QtDebug>
 #include "CGamer.h"
 
-#define NB_INPUT                4
+#define NB_INPUT                3
 #define NB_INPUT_NEURONE        4
 #define NB_OUTPUT_NEURONE       4
 
@@ -24,10 +24,12 @@ CGamer::CGamer(CWGame *game) {
         layer1Inputs << NB_INPUT;
     }
 
-    perceptron = new CPerceptron(layer1Inputs, NB_INPUT_NEURONE);
+    perceptron = new CPerceptron(layer1Inputs, NB_INPUT_NEURONE, false);
 
+    /*perceptron->addLayer(6);
+    perceptron->addLayer(8);
     perceptron->addLayer(6);
-    perceptron->addLayer(NB_OUTPUT_NEURONE);
+    perceptron->addLayer(NB_OUTPUT_NEURONE, false);*/
 }
 
 CGamer::~CGamer(void) {
@@ -54,44 +56,23 @@ void CGamer::joue(void) {
     QList<double> in[NB_INPUT_NEURONE];
     QList<double> values;
 
-    analyse(deps[0], max, nbFusion, nbVide);
-    in[0] << (double)game->getScore();
-    in[0] << (double)max;
-    in[0] << (double)nbFusion;
-    in[0] << (double)nbVide;
-
-    analyse(deps[1], max, nbFusion, nbVide);
-    in[1] << (double)game->getScore();
-    in[1] << (double)max;
-    in[1] << (double)nbFusion;
-    in[1] << (double)nbVide;
-
-    analyse(deps[2], max, nbFusion, nbVide);
-    in[2] << (double)game->getScore();
-    in[2] << (double)max;
-    in[2] << (double)nbFusion;
-    in[2] << (double)nbVide;
-
-    analyse(deps[3], max, nbFusion, nbVide);
-    in[3] << (double)game->getScore();
-    in[3] << (double)max;
-    in[3] << (double)nbFusion;
-    in[3] << (double)nbVide;
-
-    //qDebug() << in[0] << in[1] << in[2] << in[3];
-
-
     for(i=0;i<NB_INPUT_NEURONE;i++) {
+        analyse(deps[i], max, nbFusion, nbVide);
+
+        in[i] << (double)max;
+        in[i] << (double)nbFusion;
+        in[i] << (double)nbVide;
+
         inputs << in[i];
     }
 
     values = perceptron->eval(inputs);
 	
-	//qDebug() << in[0] << in[1] << in[2] << in[3] << values;
+    //qDebug() << in[0] << in[1] << in[2] << in[3] << values;
 
     max = 0;
     for(i=0;i<NB_OUTPUT_NEURONE;i++) {
-        if(deps[i]->canGo(game->getCases()) && values.at(i) != 0.0) {
+        if(deps[i]->canGo(game->getCases())) {
             if(idxMax == -1 || values.at(i) > max) {
                 max = values.at(i);
                 idxMax = i;

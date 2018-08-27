@@ -33,18 +33,18 @@ void CGenetic::run(void) {
     bool fini = false;
     int nb2048 = 0;
     QTime time;
+    int value = games[0]->genValue();
 
     time.start();
     while(!fini) {
         nbAlive = nbGame;
-        int value = games[0]->genValue();
 
         for(i=0;i<nbGame;i++) {
             gamers.at(i)->start(value);
         }
 
         while(nbAlive != 0) {
-            sleep(2);
+            usleep(100);
 
             for(i=0;i<nbGame;i++) {
                 if(gamers.at(i)->isAlive()) {
@@ -59,13 +59,17 @@ void CGenetic::run(void) {
 
         qSort(gamers.begin(), gamers.end(), lessThan);
 
-        qDebug() << "Max score" << gamers.at(0)->getScore() << gamers.at(0)->get2048Score();
+        /*for(i=0;i<nbGame;i++) {
+            qDebug() << "score" << i << gamers.at(i)->getScore();
+        }*/
 
         if(gamers.at(0)->isGagne()) {
             nb2048++;
         }else {
             nb2048 = 0;
         }
+
+        qDebug() << (nb2048 > 0 ? QString(10, QChar('*')) : "") << "Max score" << gamers.at(0)->getScore() << gamers.at(0)->get2048Score();
 
         fini = (nb2048 == 10);
 

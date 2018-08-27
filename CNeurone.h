@@ -6,7 +6,7 @@
 
 class CNeurone {
 public:
-    CNeurone(int nbGene);
+    CNeurone(int nbGene, bool useBiais);
     ~CNeurone(void);
     void init(void);
     double eval(const QList<double>& inputs) const;
@@ -16,8 +16,11 @@ public:
 private:
     int nbGene;
     double *genes;
+    bool useBiais;
+    int biais;
 
     void initGene(int idx);
+    int initBiais(void);
 };
 
 #endif // CNEURONE_H

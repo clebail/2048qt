@@ -277,7 +277,7 @@ void CWGame::nouveau(bool anim, int *value) {
 
         decodeValue(x, y, valeur, *value & 0x000000FF);
         grille[y*COTE+x].valeur = valeur;
-		score = qMax(score, valeur);
+        score = valeur;
 
         decodeValue(x, y, valeur, (*value & 0x0000FF00) >> 8);
         grille[y*COTE+x].valeur = valeur;

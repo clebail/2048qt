@@ -5,8 +5,8 @@
 #include "CGenetic.h"
 #include "ui_CResolutionDialog.h"
 
-#define NB_COLONNE          6
-#define NB_LIGNE            5
+#define NB_COLONNE          20
+#define NB_LIGNE            10
 #define NB_GAME             (NB_COLONNE*NB_LIGNE)
 
 class CResolutionDialog : public QDialog, private Ui::CResolutionDialog {

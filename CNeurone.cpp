@@ -1,8 +1,10 @@
 #include <QtGlobal>
 #include "CNeurone.h"
 
-CNeurone::CNeurone(int nbGene) {
+CNeurone::CNeurone(int nbGene, bool useBiais) {
     this->nbGene = nbGene;
+    this->useBiais = useBiais;
+    biais =initBiais();
 
     genes = new double[nbGene];
 }
@@ -21,10 +23,10 @@ void CNeurone::init(void) {
 
 double CNeurone::eval(const QList<double> &inputs) const {
     int i;
-    double s = genes[0];
+    double s = biais;
 
-    for(i=1;i<nbGene;i++) {
-        s += inputs.at(i-1) * genes[i];
+    for(i=0;i<nbGene;i++) {
+        s += genes[i] * inputs.at(i);
     }
 
     return qMax(0.0, s);
@@ -41,9 +43,15 @@ void CNeurone::from(CNeurone *n1, CNeurone *n2, int seuil) {
 
         genes[i] = src->genes[i];
     }
+
+    biais = rand() % 2 ? n1->biais : n2->biais;
 }
 
 void CNeurone::mute(int idx) {
+    if(rand() % 2) {
+        biais = initBiais();
+    }
+
     if(idx >= 0 && idx < nbGene) {
         initGene(idx);
     }
@@ -54,5 +62,10 @@ int CNeurone::getNbGene(void) const {
 }
 
 void CNeurone::initGene(int idx) {
-    genes[idx] = ((double)((rand() % 21) - 10)) + ((double)((rand() % 1000)) / 1000.0);
+    genes[idx] = ((double)((rand() % 11) - 5)) + ((double)((rand() % 1000)) / 1000.0) * (rand() % 2 ? 1 : -1);
 }
+
+int CNeurone::initBiais(void) {
+    return useBiais ? rand() % 201 - 100 : 0;
+}
+

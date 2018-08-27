@@ -1,11 +1,11 @@
 #include "CPerceptron.h"
 
-CPerceptron::CPerceptron(const QList<int>& nbInputs, int nbNeurone) {
+CPerceptron::CPerceptron(const QList<int>& nbInputs, int nbNeurone, bool useBiais) {
     QList<CNeurone *> layer;
     int i;
 
     for(i=0;i<nbNeurone;i++) {
-        CNeurone *n = new CNeurone(nbInputs.at(i)+1);
+        CNeurone *n = new CNeurone(nbInputs.at(i), useBiais);
         layer.append(n);
     }
 
@@ -49,29 +49,29 @@ QList<double> CPerceptron::eval(const QList<QList<double> >& inputs) {
         CNeurone *n = layers.at(0).at(i);
         resultat << n->eval(inputs.at(i));
     }
-    in << resultat;
 
     for(i=1;i<layers.size();i++) {
+        in.clear();
+        in << resultat;
+        resultat.clear();
+
         for(j=0;j<layers.at(i).size();j++) {
             CNeurone *n = layers.at(i).at(j);
 
-            resultat.clear();
             resultat << n->eval(in);
-            in.clear();
-            in << resultat;
         }
     }
 
     return resultat;
 }
 
-void CPerceptron::addLayer(int nbNeurone) {
+void CPerceptron::addLayer(int nbNeurone, bool useBiais) {
     int nbInput = layers.last().size();
     int i;
     QList<CNeurone *> layer;
 
     for(i=0;i<nbNeurone;i++) {
-        CNeurone *n = new CNeurone(nbInput+1);
+        CNeurone *n = new CNeurone(nbInput, useBiais);
         layer.append(n);
     }
 
@@ -91,7 +91,9 @@ void CPerceptron::from(CPerceptron * p1, CPerceptron * p2) {
             int seuil = rand() % n->getNbGene();
 
             n->from(n1, n2, seuil);
-            n->mute(rand() % n->getNbGene());
+            if(rand() % 100 > 80) {
+                n->mute(rand() % n->getNbGene());
+            }
         }
     }
 }
