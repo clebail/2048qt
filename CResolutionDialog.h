@@ -19,6 +19,7 @@ private:
     CGenetic *genetic;
 private slots:
     void on_pbGo_clicked(bool checked=false);
+    void on_pbPause_clicked(bool checked=false);
 };
 
 #endif // CRESOLUTIONDIALOG_H

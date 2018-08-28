@@ -3,6 +3,50 @@
 #include <QtDebug>
 #include "CDeplacement.h"
 //-----------------------------------------------------------------------------
+int CDeplacement::getNbFusionnPossibleLigne(SCase *grille) {
+    int x, y;
+    int result = 0;
+
+    for(x=0;x<COTE;x++) {
+        int cur = grille[x].valeur;
+        for(y=1;y<COTE;y++) {
+            int idx = y * COTE + x;
+            if(grille[idx].valeur != 0) {
+                if(grille[idx].valeur == cur) {
+                    result++;
+                    cur = 0;
+                } else {
+                    cur = grille[idx].valeur;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+//-----------------------------------------------------------------------------
+int CDeplacement::getNbFusionnPossibleColonne(SCase *grille) {
+    int x, y;
+    int result = 0;
+
+    for(y=0;y<COTE;y++) {
+        int cur = grille[y * COTE].valeur;
+        for(x=1;x<COTE;x++) {
+            int idx = y * COTE + x;
+            if(grille[idx].valeur != 0) {
+                if(grille[idx].valeur == cur) {
+                    result++;
+                    cur = 0;
+                } else {
+                    cur = grille[idx].valeur;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+//-----------------------------------------------------------------------------
 bool CDeplacement::deplacement(SCase *grille, int &score, bool anim) {
     bool move;
     int nbMove = 0;
@@ -57,6 +101,12 @@ bool CDeplacement::canGo(const TCases &cases) {
     return false;
 }
 //-----------------------------------------------------------------------------
+int CDeplacement::getNbFusionPossible(SCase *grille) {
+    pf nbFusionPossible = getPf();
+
+    return (this->*nbFusionPossible)(grille);
+}
+//-----------------------------------------------------------------------------
 int CDeplacementHaut::getVoisin(int idx) {
     return idx - COTE;
 }
@@ -72,6 +122,10 @@ bool CDeplacementHaut::next(void) {
 //-----------------------------------------------------------------------------
 void CDeplacementHaut::init(void) {
     idx = COTE;
+}
+//-----------------------------------------------------------------------------
+CDeplacement::pf CDeplacementHaut::getPf(void) {
+    return &CDeplacementHaut::getNbFusionnPossibleColonne;
 }
 //-----------------------------------------------------------------------------
 int CDeplacementDroite::getVoisin(int idx) {
@@ -95,6 +149,10 @@ void CDeplacementDroite::init(void) {
     idx = CASE - 2;
 }
 //-----------------------------------------------------------------------------
+CDeplacement::pf CDeplacementDroite::getPf(void) {
+    return &CDeplacementDroite::getNbFusionnPossibleLigne;
+}
+//-----------------------------------------------------------------------------
 int CDeplacementBas::getVoisin(int idx) {
     return idx + COTE;
 }
@@ -111,6 +169,10 @@ bool CDeplacementBas::next(void) {
 //-----------------------------------------------------------------------------
 void CDeplacementBas::init(void) {
     idx = CASE - COTE - 1;
+}
+//-----------------------------------------------------------------------------
+CDeplacement::pf CDeplacementBas::getPf(void) {
+    return &CDeplacementBas::getNbFusionnPossibleColonne;
 }
 //-----------------------------------------------------------------------------
 int CDeplacementGauche::getVoisin(int idx) {
@@ -134,3 +196,8 @@ void CDeplacementGauche::init(void) {
     idx = 1;
 }
 //-----------------------------------------------------------------------------
+CDeplacement::pf CDeplacementGauche::getPf(void) {
+    return &CDeplacementGauche::getNbFusionnPossibleLigne;
+}
+//-----------------------------------------------------------------------------
+

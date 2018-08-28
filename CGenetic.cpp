@@ -17,6 +17,8 @@ CGenetic::CGenetic(CWGame **games, int nbGame) {
 
         gamers.append(gamer);
     }
+
+    inPause = false;
 }
 
 CGenetic::~CGenetic(void) {
@@ -44,24 +46,25 @@ void CGenetic::run(void) {
         }
 
         while(nbAlive != 0) {
-            usleep(100);
+            if(!inPause) {
+                usleep(100);
 
-            for(i=0;i<nbGame;i++) {
-                if(gamers.at(i)->isAlive()) {
-                    gamers.at(i)->joue();
+                for(i=0;i<nbGame;i++) {
+                    if(gamers.at(i)->isAlive()) {
+                        gamers.at(i)->joue();
 
-                    if(!gamers.at(i)->isAlive()) {
-                        nbAlive--;
+                        if(!gamers.at(i)->isAlive()) {
+                            nbAlive--;
+                        }
                     }
                 }
+                //qDebug() << "";
+            } else {
+                usleep(100);
             }
         }
 
         qSort(gamers.begin(), gamers.end(), lessThan);
-
-        /*for(i=0;i<nbGame;i++) {
-            qDebug() << "score" << i << gamers.at(i)->getScore();
-        }*/
 
         if(gamers.at(0)->isGagne()) {
             nb2048++;
@@ -79,6 +82,10 @@ void CGenetic::run(void) {
     }
 
     qDebug() << time.fromString("hh:mm:ss");
+}
+
+void CGenetic::togglePause(void) {
+    inPause = !inPause;
 }
 
 void CGenetic::croise(void) {

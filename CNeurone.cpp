@@ -1,4 +1,5 @@
 #include <QtGlobal>
+#include <math.h>
 #include "CNeurone.h"
 
 CNeurone::CNeurone(int nbGene, bool useBiais) {
@@ -29,7 +30,8 @@ double CNeurone::eval(const QList<double> &inputs) const {
         s += genes[i] * inputs.at(i);
     }
 
-    return qMax(0.0, s);
+    //return qMax(0.0, s);
+    return 1.0 / (1.0 + exp(-s));
 }
 
 void CNeurone::from(CNeurone *n1, CNeurone *n2, int seuil) {
@@ -62,7 +64,7 @@ int CNeurone::getNbGene(void) const {
 }
 
 void CNeurone::initGene(int idx) {
-    genes[idx] = ((double)((rand() % 11) - 5)) + ((double)((rand() % 1000)) / 1000.0) * (rand() % 2 ? 1 : -1);
+    genes[idx] = ((double)((rand() % 101) - 50)) + ((double)((rand() % 1000)) / 1000.0) * (rand() % 2 ? 1 : -1);
 }
 
 int CNeurone::initBiais(void) {

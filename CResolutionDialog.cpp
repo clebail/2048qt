@@ -16,6 +16,8 @@ CResolutionDialog::CResolutionDialog(QWidget *parent) : QDialog(parent) {
             layout->addWidget(games[i], y, x);
         }
     }
+
+    genetic = 0;
 }
 
 CResolutionDialog::~CResolutionDialog(void) {
@@ -30,4 +32,10 @@ void CResolutionDialog::on_pbGo_clicked(bool) {
     genetic = new CGenetic(games, NB_GAME);
 
     genetic->start();
+}
+
+void CResolutionDialog::on_pbPause_clicked(bool) {
+    if(genetic != 0) {
+        genetic->togglePause();
+    }
 }

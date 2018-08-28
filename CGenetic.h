@@ -11,10 +11,12 @@ public:
     CGenetic(CWGame **games, int nbGame);
     ~CGenetic(void);
     void run(void);
+    void togglePause(void);
 private:
     CWGame **games;
     int nbGame;
     QList<CGamer *> gamers;
+    bool inPause;
 
     void croise(void);
     void croiseGamers(int i1, int i2, int ir);

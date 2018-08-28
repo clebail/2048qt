@@ -25,7 +25,7 @@ private:
     int score;
     int nbCoup;
 
-    void analyse(CDeplacement *dep, int& max, int& nbFusion, int& nbVide);
+    void analyse(CDeplacement *dep, int& max, int& nbFusion, int& nbVide, int &nbFusionPossible);
 };
 
 #endif // CGAMER_H

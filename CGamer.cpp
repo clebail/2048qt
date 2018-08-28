@@ -1,7 +1,7 @@
 #include <QtDebug>
 #include "CGamer.h"
 
-#define NB_INPUT                3
+#define NB_INPUT                4
 #define NB_INPUT_NEURONE        4
 #define NB_OUTPUT_NEURONE       4
 
@@ -26,9 +26,9 @@ CGamer::CGamer(CWGame *game) {
 
     perceptron = new CPerceptron(layer1Inputs, NB_INPUT_NEURONE, false);
 
-    /*perceptron->addLayer(6);
-    perceptron->addLayer(8);
-    perceptron->addLayer(6);
+    /*perceptron->addLayer(6, false);
+    perceptron->addLayer(8, false);
+    perceptron->addLayer(6, false);
     perceptron->addLayer(NB_OUTPUT_NEURONE, false);*/
 }
 
@@ -50,6 +50,7 @@ void CGamer::joue(void) {
     int max = 0;
     int nbFusion;
     int nbVide;
+    int nbFusionPossible;
     int idxMax = -1;
     int i;
     QList<QList<double> > inputs;
@@ -57,11 +58,12 @@ void CGamer::joue(void) {
     QList<double> values;
 
     for(i=0;i<NB_INPUT_NEURONE;i++) {
-        analyse(deps[i], max, nbFusion, nbVide);
+        analyse(deps[i], max, nbFusion, nbVide, nbFusionPossible);
 
         in[i] << (double)max;
         in[i] << (double)nbFusion;
         in[i] << (double)nbVide;
+        in[i] << (double)nbFusionPossible;
 
         inputs << in[i];
     }
@@ -127,20 +129,22 @@ void CGamer::start(int value) {
     alive = true;
     score = -1;
     nbCoup = 0;
-    game->nouveau(false, &value);
+    game->nouveau(false);
 }
 
 void CGamer::from(CGamer *g1, CGamer *g2) {
     perceptron->from(g1->perceptron, g2->perceptron);
 }
 
-void CGamer::analyse(CDeplacement *dep, int& max, int& nbFusion, int& nbVide) {
+void CGamer::analyse(CDeplacement *dep, int& max, int& nbFusion, int& nbVide, int &nbFusionPossible) {
     TCases grille;
     int i;
 
     memcpy(grille, game->getCases(), CASE * sizeof(SCase));
 
+    max = 0;
     dep->deplacement(grille, max, true);
+    nbFusionPossible = dep->getNbFusionPossible(grille);
 
     nbFusion = 0;
     nbVide = 0;
