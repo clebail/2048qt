@@ -1,6 +1,7 @@
 #ifndef CGAMER_H
 #define CGAMER_H
 
+#include <QDataStream>
 #include "CWGame.h"
 #include "CPerceptron.h"
 
@@ -14,8 +15,11 @@ public:
     bool isAlive(void) const;
     int getScore(void);
     int get2048Score(void);
-    void start(int value);
+    void start(void);
     void from(CGamer *g1, CGamer *g2);
+    int diff(CGamer *other) const;
+    void setShareScore(int score);
+    int getShareScore(void) const;
 private:
     CWGame *game;
     CPerceptron *perceptron;
@@ -24,8 +28,13 @@ private:
     bool alive;
     int score;
     int nbCoup;
+    int shareScore;
 
-    void analyse(CDeplacement *dep, int& max, int& nbFusion, int& nbVide, int &nbFusionPossible);
+    friend QDataStream& operator<<(QDataStream& out, const CGamer * &gamer);
+    friend QDataStream& operator>>(QDataStream& in, CGamer& gamer);
 };
+
+QDataStream& operator<<(QDataStream& out, const CGamer* &gamer);
+QDataStream& operator>>(QDataStream& in, CGamer& gamer);
 
 #endif // CGAMER_H

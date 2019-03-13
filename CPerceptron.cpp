@@ -3,6 +3,7 @@
 CPerceptron::CPerceptron(const QList<int>& nbInputs, int nbNeurone, bool useBiais) {
     QList<CNeurone *> layer;
     int i;
+    this->useBiais = useBiais;
 
     for(i=0;i<nbNeurone;i++) {
         CNeurone *n = new CNeurone(nbInputs.at(i), useBiais);
@@ -65,7 +66,7 @@ QList<double> CPerceptron::eval(const QList<QList<double> >& inputs) {
     return resultat;
 }
 
-void CPerceptron::addLayer(int nbNeurone, bool useBiais) {
+void CPerceptron::addLayer(int nbNeurone) {
     int nbInput = layers.last().size();
     int i;
     QList<CNeurone *> layer;
@@ -96,4 +97,43 @@ void CPerceptron::from(CPerceptron * p1, CPerceptron * p2) {
             }
         }
     }
+}
+
+int CPerceptron::diff(CPerceptron * other) const {
+    int i;
+    int diff = 0;
+
+    for(i=0;i<layers.size();i++) {
+        int j;
+
+        for(j=0;j<layers.at(i).size();j++) {
+            CNeurone *n = layers.at(i).at(j);
+            CNeurone *no = other->layers.at(i).at(j);
+            diff += n->diff(no);
+        }
+    }
+
+    return diff;
+}
+
+QDataStream& operator<<(QDataStream& out, const CPerceptron& perceptron) {
+    int i;
+
+    out << (qint32)perceptron.layers.size();
+    out << perceptron.useBiais;
+    out << (qint32)perceptron.layers.at(0).size();
+    for(i=0;i<perceptron.layers.at(0).size();i++) {
+        out << perceptron.layers.at(0).at(i);
+    }
+
+    for(i=1;i<perceptron.layers.size();i++) {
+        int j;
+
+        out << (qint32)perceptron.layers.at(i).size();
+        for(j=0;j<perceptron.layers.at(i).size();j++) {
+            out << perceptron.layers.at(i).at(j);
+        }
+    }
+
+    return out;
 }

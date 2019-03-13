@@ -1,8 +1,8 @@
 #include <QtDebug>
 #include "CGamer.h"
 
-#define NB_INPUT                4
-#define NB_INPUT_NEURONE        4
+#define NB_INPUT                1
+#define NB_INPUT_NEURONE        CASE
 #define NB_OUTPUT_NEURONE       4
 
 CGamer::CGamer(CWGame *game) {
@@ -25,11 +25,8 @@ CGamer::CGamer(CWGame *game) {
     }
 
     perceptron = new CPerceptron(layer1Inputs, NB_INPUT_NEURONE, false);
-
-    /*perceptron->addLayer(6, false);
-    perceptron->addLayer(8, false);
-    perceptron->addLayer(6, false);
-    perceptron->addLayer(NB_OUTPUT_NEURONE, false);*/
+    perceptron->addLayer(8);
+    perceptron->addLayer(NB_OUTPUT_NEURONE);
 }
 
 CGamer::~CGamer(void) {
@@ -47,23 +44,15 @@ void CGamer::init(void) {
 }
 
 void CGamer::joue(void) {
-    int max = 0;
-    int nbFusion;
-    int nbVide;
-    int nbFusionPossible;
+    double max = 0;
     int idxMax = -1;
     int i;
-    QList<QList<double> > inputs;
+    QList<QList<double>> inputs;
     QList<double> in[NB_INPUT_NEURONE];
     QList<double> values;
 
     for(i=0;i<NB_INPUT_NEURONE;i++) {
-        analyse(deps[i], max, nbFusion, nbVide, nbFusionPossible);
-
-        in[i] << (double)max;
-        in[i] << (double)nbFusion;
-        in[i] << (double)nbVide;
-        in[i] << (double)nbFusionPossible;
+        in[i] << game->getValeur(i);
 
         inputs << in[i];
     }
@@ -116,7 +105,11 @@ bool CGamer::isAlive(void) const {
 
 int CGamer::getScore(void) {
     if(score == -1) {
-        score = game->getScore() * 10 + game->getSomme();
+        if(game->getScore() == 2048) {
+            score = 204800 - nbCoup;
+        } else {
+            score = game->getScore() * 10 + game->getSomme();
+        }
     }
     return score;
 }
@@ -125,7 +118,7 @@ int CGamer::get2048Score(void) {
     return game->getScore();
 }
 
-void CGamer::start(int value) {
+void CGamer::start(void) {
     alive = true;
     score = -1;
     nbCoup = 0;
@@ -136,24 +129,20 @@ void CGamer::from(CGamer *g1, CGamer *g2) {
     perceptron->from(g1->perceptron, g2->perceptron);
 }
 
-void CGamer::analyse(CDeplacement *dep, int& max, int& nbFusion, int& nbVide, int &nbFusionPossible) {
-    TCases grille;
-    int i;
+int CGamer::diff(CGamer *other) const {
+    return perceptron->diff(other->perceptron);
+}
 
-    memcpy(grille, game->getCases(), CASE * sizeof(SCase));
+void CGamer::setShareScore(int score) {
+    shareScore = score;
+}
 
-    max = 0;
-    dep->deplacement(grille, max, true);
-    nbFusionPossible = dep->getNbFusionPossible(grille);
+int CGamer::getShareScore(void) const {
+    return shareScore;
+}
 
-    nbFusion = 0;
-    nbVide = 0;
+QDataStream& operator<<(QDataStream& out, const CGamer * &gamer) {
+    out << *gamer->perceptron;
 
-    for(i=0;i<CASE;i++) {
-        if(grille[i].fusion) {
-            nbFusion++;
-        } else if(grille[i].valeur == 0) {
-            nbVide++;
-        }
-    }
+    return out;
 }

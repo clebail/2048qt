@@ -68,86 +68,8 @@ CWGame::EResultat CWGame::joue(CDeplacement *dep, bool anim) {
     return (perdu() ? (gagne ? CWGame::erFin : CWGame::erPerdu) : isMove ? CWGame::erMove : CWGame::erNone);
 }
 //-----------------------------------------------------------------------------
-void CWGame::decodeValue(int& x, int& y, int& valeur, int value) {
-    valeur = value & 0x0000000F;
-    x = (value & 0x000000C0) >> 6;
-    y = (value & 0x00000030) >> 4;
-}
-//-----------------------------------------------------------------------------
-int CWGame::encodeValue(int x, int y, int value) {
-    return ((x & 0x00000003) << 6) | ((y & 0x00000003) << 4) | (value & 0x0000000F);
-}
-//-----------------------------------------------------------------------------
-int CWGame::getColonneMax(int colIdx) {
-    int i, c;
-    int m = 0;
-
-    for(i=0,c=colIdx;i<COTE;i++,c+=COTE) {
-        m = qMax(m, grille[c].valeur);
-    }
-
-    return m;
-}
-//-----------------------------------------------------------------------------
-int CWGame::getLigneMax(int ligIdx) {
-    int i, l;
-    int m = 0;
-
-    for(i=0,l=ligIdx*COTE;i<COTE;i++,l++) {
-        m = qMax(m, grille[l].valeur);
-    }
-
-    return m;
-}
-//-----------------------------------------------------------------------------
-void CWGame:: getColonneResultatApres(int colIdx, int sens, int& max, int& nbFusion, int& nbVide) {
-    int i, c;
-    int mc = 0;
-    int step = COTE * sens;
-
-    max = 0;
-    nbFusion = 0;
-    nbVide = COTE;
-
-    c = (COTE * (COTE - 1) * (-0.5 * sens + 0.5)) + colIdx;
-    for(i=0;i<COTE-1;i++,c+=step) {
-        if(grille[c].valeur != 0) {
-            nbVide--;
-            mc = qMax(mc, grille[c].valeur);
-            if(grille[c+step].valeur == grille[c].valeur) {
-                nbFusion++;
-                max = qMax(max, grille[c].valeur * 2);
-                c+=step;
-            }
-        }
-    }
-
-    max = qMax(max, mc);
-}
-//-----------------------------------------------------------------------------
-void CWGame::getLigneResultatApres(int ligIdx, int sens, int& max, int& nbFusion, int& nbVide) {
-    int i, l;
-    int ml = 0;
-    int step = sens;
-
-    max = 0;
-    nbFusion = 0;
-    nbVide = COTE;
-
-    l = COTE * ligIdx + (-0.5 * sens + 0.5) * (COTE - 1);
-    for(i=0;i<COTE-1;i++,l+=step) {
-        if(grille[l].valeur != 0) {
-            nbVide--;
-            ml = qMax(ml, grille[l].valeur);
-            if(grille[l+step].valeur == grille[l].valeur) {
-                nbFusion++;
-                max = qMax(max, grille[l].valeur * 2);
-                l+=step;
-            }
-        }
-    }
-
-    max = qMax(max, ml);
+int CWGame::getValeur(int idx) const {
+    return grille[idx].valeur;
 }
 //-----------------------------------------------------------------------------
 void CWGame::onTimer(void) {
@@ -264,25 +186,13 @@ bool CWGame::ajout(bool anim) {
     return false;
 }
 //-----------------------------------------------------------------------------
-void CWGame::nouveau(bool anim, int *value) {
+void CWGame::nouveau(bool anim) {
     score = 0;
     gagne = false;
     memset(grille, 0, CASE * sizeof(SCase));
 
-    if(value == 0) {
-        ajout(anim);
-        ajout(anim);
-    } else {
-        int x, y, valeur;
-
-        decodeValue(x, y, valeur, *value & 0x000000FF);
-        grille[y*COTE+x].valeur = valeur;
-        score = valeur;
-
-        decodeValue(x, y, valeur, (*value & 0x0000FF00) >> 8);
-        grille[y*COTE+x].valeur = valeur;
-		score = qMax(score, valeur);
-    }
+    ajout(anim);
+    ajout(anim);
 }
 //-----------------------------------------------------------------------------
 CWGame::EResultat CWGame::haut(bool anim) {
@@ -351,85 +261,5 @@ int CWGame::getSomme(void) {
     }
 
     return s;
-}
-//-----------------------------------------------------------------------------
-int CWGame::genValue(void) {
-    int vides[CASE];
-    int i, j, k;
-    TCases grille;
-    int value = 0;
-
-    memset(grille, 0, CASE * sizeof(SCase));
-
-    for(k=0;k<2;k++) {
-        int idx;
-        for(i=j=0;i<CASE;i++) {
-            if(grille[i].valeur == 0) {
-                vides[j++] = i;
-            }
-        }
-
-        idx = vides[rand() % (CASE - k)];
-        grille[idx].valeur = 2 * (rand() % 2 + 1);
-
-        value <<= 8;
-        value |= encodeValue(idx % COTE, idx / COTE, grille[idx].valeur);
-    }
-
-    return value;
-}
-//-----------------------------------------------------------------------------
-int CWGame::getColMax(void) {
-    int m=0;
-    int i;
-
-    for(i=0;i<COTE;i++) {
-        m = qMax(getColonneMax(i), m);
-    }
-
-    return m;
-}
-//-----------------------------------------------------------------------------
-int CWGame::getLigMax(void) {
-    int m=0;
-    int i;
-
-    for(i=0;i<COTE;i++) {
-        m = qMax(getLigneMax(i), m);
-    }
-
-    return m;
-}
-//-----------------------------------------------------------------------------
-void CWGame::getColResultatApres(int sens, int& max, int& nbFusion, int& nbVide) {
-    int i;
-
-    max = 0;
-    nbFusion = 0;
-    nbVide = 0;
-    for(i=0;i<COTE;i++) {
-        int cMax, cNbFusion, cNbVide;
-
-        getColonneResultatApres(i, sens, cMax, cNbFusion, cNbVide);
-        max = qMax(cMax, max);
-        nbFusion += cNbFusion;
-        nbVide += cNbVide;
-    }
-}
-//-----------------------------------------------------------------------------
-void CWGame::getLigResultatApres(int sens, int& max, int& nbFusion, int& nbVide) {
-    int i;
-
-    max = 0;
-    nbFusion = 0;
-    nbVide = 0;
-    for(i=0;i<COTE;i++) {
-        int lMax, lNbFusion, lNbVide;
-
-        getLigneResultatApres(i, sens, lMax, lNbFusion, lNbVide);
-        max = qMax(lMax, max);
-        nbFusion += lNbFusion;
-        nbVide += lNbVide;
-    }
 }
 //-----------------------------------------------------------------------------

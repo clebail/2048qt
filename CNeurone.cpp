@@ -30,7 +30,6 @@ double CNeurone::eval(const QList<double> &inputs) const {
         s += genes[i] * inputs.at(i);
     }
 
-    //return qMax(0.0, s);
     return 1.0 / (1.0 + exp(-s));
 }
 
@@ -63,11 +62,33 @@ int CNeurone::getNbGene(void) const {
     return nbGene;
 }
 
+int CNeurone::diff(CNeurone *other) const {
+   int diff = 0;
+   int i;
+
+   for(i=0;i<nbGene;i++) {
+       diff += fabs(genes[i] - other->genes[i]) > 0.001 ? 1 : 0;
+   }
+
+   return diff;
+}
+
 void CNeurone::initGene(int idx) {
-    genes[idx] = ((double)((rand() % 101) - 50)) + ((double)((rand() % 1000)) / 1000.0) * (rand() % 2 ? 1 : -1);
+    genes[idx] = (rand() % 2001 - 1000) / 10.0;
+    //genes[idx] = ((double)((rand() % 101) - 50)) + ((double)((rand() % 1000)) / 1000.0) * (rand() % 2 ? 1 : -1);
 }
 
 int CNeurone::initBiais(void) {
     return useBiais ? rand() % 201 - 100 : 0;
 }
 
+QDataStream& operator<<(QDataStream& out, const CNeurone& neurone) {
+    int i;
+
+    out << (qint32)neurone.getNbGene();
+    for(i=0;i<neurone.getNbGene();i++) {
+        out << neurone.genes[i];
+    }
+
+    return out;
+}

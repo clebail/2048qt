@@ -23,12 +23,6 @@ private:
 
     void calculFont(int valeur, int tailleMax);
     CWGame::EResultat joue(CDeplacement *dep, bool anim);
-    void decodeValue(int& x, int& y, int& valeur, int value);
-    int encodeValue(int x, int y, int value);
-    int getColonneMax(int colIdx);
-    int getLigneMax(int ligIdx);
-    void getColonneResultatApres(int colIdx, int sens, int& max, int& nbFusion, int& nbVide);
-    void getLigneResultatApres(int ligIdx, int sens, int& max, int& nbFusion, int& nbVide);
 private slots:
     void onTimer(void);
 protected:
@@ -38,7 +32,7 @@ public:
     explicit CWGame(QWidget *parent = 0, bool initTimer = false);
     ~CWGame(void);
     bool ajout(bool anim=true);
-    void nouveau(bool anim=true, int *value=0);
+    void nouveau(bool anim=true);
     CWGame::EResultat haut(bool anim=true);
     CWGame::EResultat droite(bool anim=true);
     CWGame::EResultat bas(bool anim=true);
@@ -47,11 +41,7 @@ public:
     const TCases& getCases(void) const;
     bool perdu(void);
     int getSomme(void);
-    int genValue(void);
-    int getColMax(void);
-    int getLigMax(void);
-    void getColResultatApres(int sens, int& max, int& nbFusion, int& nbVide);
-    void getLigResultatApres(int sens, int& max, int& nbFusion, int& nbVide);
+    int getValeur(int idx) const;
 };
 //-----------------------------------------------------------------------------
 #endif // __CWGAME_H__

@@ -1,7 +1,8 @@
 //-----------------------------------------------------------------------------
 #include <QApplication>
 #include <QTextCodec>
-#include "CMainWindow.h"
+//#include "CMainWindow.h"
+#include "CResolutionDialog.h"
 //-----------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -9,7 +10,7 @@ int main(int argc, char *argv[]) {
     QTextCodec::setCodecForTr(QTextCodec::codecForName("utf8"));
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 
-    CMainWindow w;
+    CResolutionDialog w;
     w.show();
 
     return a.exec();

@@ -21,6 +21,7 @@ private:
     void croise(void);
     void croiseGamers(int i1, int i2, int ir);
     int genValue(void);
+    void partagePopulation(void);
 };
 
 #endif // CGENETIC_H
