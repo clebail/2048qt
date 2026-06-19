@@ -4,3 +4,6 @@ ui_*.*
 qrc_*.*
 2048qt
 Makefile
+.qmake.stash
+2048qt.pro.user
+.qtc_clangd

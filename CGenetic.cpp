@@ -1,5 +1,7 @@
 #include <QtDebug>
 #include <QTime>
+#include <QElapsedTimer>
+#include <algorithm>
 #include "CGenetic.h"
 
 bool lessThan(CGamer *g1, CGamer *g2) {
@@ -34,7 +36,7 @@ void CGenetic::run(void) {
     int nbAlive = nbGame;
     bool fini = false;
     int nb2048 = 0;
-    QTime time;
+    QElapsedTimer time;
 
     time.start();
     while(!fini) {
@@ -65,7 +67,7 @@ void CGenetic::run(void) {
         }
 
         partagePopulation();
-        qSort(gamers.begin(), gamers.end(), lessThan);
+        std::sort(gamers.begin(), gamers.end(), lessThan);
 
         if(gamers.at(0)->isGagne()) {
             nb2048++;
@@ -82,7 +84,7 @@ void CGenetic::run(void) {
         }
     }
 
-    qDebug() << time.toString("hh:mm:ss");
+    qDebug() << QTime(0, 0).addMSecs(time.elapsed()).toString("hh:mm:ss");
     qDebug() << gamers.at(0);
 }
 

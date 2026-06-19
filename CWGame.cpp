@@ -37,7 +37,7 @@ void CWGame::calculFont(int valeur, int tailleMax) {
         do {
             font = QFont("Arial", fontSize);
             QFontMetrics fm(font);
-            largeur = fm.width(texte) + 2 * TRAIT;
+            largeur = fm.horizontalAdvance(texte) + 2 * TRAIT;
             hauteur = fm.height() + 2 * TRAIT;
 
             fontSize--;
