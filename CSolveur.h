@@ -29,6 +29,9 @@ private:
     bool gameUpdated;
 
     CDeplacement::EDirection solve();
+    int expectIMax(const CGame &game, int depth = 0);
+    int chanceNode(const CGame &game, int depth);
+    int evaluate(const CGame &game);
 };
 //-----------------------------------------------------------------------------
 #endif // __CSOLVEUR_H__

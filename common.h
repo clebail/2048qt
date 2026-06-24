@@ -4,6 +4,10 @@
 //-----------------------------------------------------------------------------
 #define COTE                   4
 #define CASE                   (COTE*COTE)
+#define MAX_DEPTH              3
+#define MAX_VIDE               4
+#define POID_VIDE              10
+#define POID_MONO              1
 //-----------------------------------------------------------------------------
 typedef struct _SCase {
     bool nouveau;

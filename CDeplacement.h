@@ -19,7 +19,7 @@ protected:
     int getNbFusionnPossibleLigne(SCase *grille);
     int getNbFusionnPossibleColonne(SCase *grille);
 public:
-    enum EDirection { edHaut, edDroite, edBas, edGauche };
+    enum EDirection { edNone, edHaut, edDroite, edBas, edGauche };
 
     bool deplacement(SCase *grille, int &score, bool anim = true);
     bool canGo(const TCases& cases);

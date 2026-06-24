@@ -13,7 +13,7 @@ public:
     CGame(const CGame &other) = default;
     CGame& operator=(const CGame &other) = default;
 
-    bool ajout(bool anim = false);
+    bool ajout(bool anim = false, int *idx = nullptr, int *value = nullptr);
     void nouveau(bool anim = false);
     EResultat haut(bool anim = false);
     EResultat droite(bool anim = false);
@@ -26,7 +26,9 @@ public:
     int getSomme() const;
     int getValeur(int idx) const;
     bool isGagne() const;
-
+    bool canMove(CDeplacement::EDirection dir) const;
+    bool move(CDeplacement::EDirection dir);
+    int getCasesVide(int *vides) const;
 private:
     int score;
     TCases grille;
