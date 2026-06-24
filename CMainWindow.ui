@@ -42,6 +42,38 @@
     <item>
      <widget class="CWGame" name="wGame" native="true"/>
     </item>
+    <item>
+     <widget class="QWidget" name="widget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="pbIA">
+         <property name="text">
+          <string>IA</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -50,7 +82,7 @@
      <x>0</x>
      <y>0</y>
      <width>655</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="mnuFichier">
@@ -72,11 +104,6 @@
   <action name="actQuitter">
    <property name="text">
     <string>&amp;Quiter</string>
-   </property>
-  </action>
-  <action name="actResolution">
-   <property name="text">
-    <string>Résolution</string>
    </property>
   </action>
  </widget>
