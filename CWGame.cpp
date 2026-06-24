@@ -1,19 +1,20 @@
 //-----------------------------------------------------------------------------
 #include <QPainter>
+#include <QPixmap>
+#include <QDir>
 #include <QtDebug>
-#include <QGraphicsBlurEffect>
 #include <tgmath.h>
 #include "CWGame.h"
 //-----------------------------------------------------------------------------
 #define TRAIT       6
-#define COULEURS    12
+#define COULEURS    17
 #define MS          1000
 #define IMG         24
 #define ANIM        8
 #define DELAI       (MS/IMG)
 //-----------------------------------------------------------------------------
 static QColor couleurs[COULEURS] = {
-    QColor(0xA0, 0xA0, 0xA0), //0
+    QColor(0xA0, 0xA0, 0xA0), //0 (case vide)
     QColor(0xFF, 0xCD, 0xD2), //2
     QColor(0xF8, 0xBB, 0xD0), //4
     QColor(0xE1, 0xBE, 0xE7), //8
@@ -24,7 +25,12 @@ static QColor couleurs[COULEURS] = {
     QColor(0xC8, 0xE6, 0xC9), //256
     QColor(0xDC, 0xED, 0xC8), //512
     QColor(0xFF, 0xF9, 0xCA), //1024
-    QColor(0xD7, 0xCC, 0xC8), //2048
+    QColor(0xFF, 0xE0, 0x82), //2048
+    QColor(0xFF, 0xB3, 0x00), //4096
+    QColor(0xFF, 0x6F, 0x00), //8192
+    QColor(0xF4, 0x43, 0x36), //16384
+    QColor(0xD5, 0x00, 0x2C), //32768
+    QColor(0x6A, 0x1B, 0x9A), //65536
 };
 //-----------------------------------------------------------------------------
 void CWGame::calculFont(int valeur, int tailleMax) {
@@ -52,29 +58,8 @@ void CWGame::calculFont(int valeur, int tailleMax) {
     }
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::joue(CDeplacement *dep, bool anim) {
-    bool isMove = dep->deplacement(grille, score, anim);
-
-    if(isMove) {
-        if(!ajout(anim)) {
-            return gagne ? CWGame::erFin : CWGame::erPerdu;
-        }
-        if(score == 2048) {
-            gagne = true;
-            return CWGame::erGagne;
-        }
-    }
-
-    return (perdu() ? (gagne ? CWGame::erFin : CWGame::erPerdu) : isMove ? CWGame::erMove : CWGame::erNone);
-}
-//-----------------------------------------------------------------------------
-int CWGame::getValeur(int idx) const {
-    return grille[idx].valeur;
-}
-//-----------------------------------------------------------------------------
 void CWGame::onTimer(void) {
     step++;
-
     repaint();
 }
 //-----------------------------------------------------------------------------
@@ -86,26 +71,28 @@ void CWGame::paintEvent(QPaintEvent *) {
     int yD = (height() - taille) / 2;
     QPen pen(Qt::darkGray);
     int i;
+    const TCases& grille = game.getCases();
 
-    calculFont(score, tailleCase);
+    calculFont(game.getScore(), tailleCase);
 
     pen.setWidth(TRAIT);
     painter.setPen(pen);
     painter.setBrush(QBrush(couleurs[0]));
     painter.drawRect(xD, yD, taille, taille);
 
-    for(i=0;i<CASE;i++) {
+    for(i = 0; i < CASE; i++) {
         int x = (i % COTE) * tailleCase + xD;
         int y = (i / COTE) * tailleCase + yD;
         int idCouleur = 0;
         QRect rect(x, y, tailleCase, tailleCase);
 
         if(grille[i].valeur != 0) {
-            idCouleur = ((int)log2(grille[i].valeur)) % COULEURS;
+            int exposant = (int)log2(grille[i].valeur);
+            idCouleur = 1 + (exposant - 1) % (COULEURS - 1);
         }
 
         if(grille[i].nouveau) {
-            double scale = (double)step/(double)ANIM;
+            double scale = (double)step / (double)ANIM;
             int newTaille = tailleCase * scale;
             int translate = (tailleCase - newTaille) / 2;
 
@@ -120,19 +107,19 @@ void CWGame::paintEvent(QPaintEvent *) {
         painter.drawRect(rect);
 
         if(grille[i].valeur != 0 && !grille[i].nouveau) {
-            QFont font(this->font);
+            QFont f(this->font);
             if(grille[i].fusion) {
-                font.setPointSize(this->font.pointSize() / (ANIM - step));
+                f.setPointSize(this->font.pointSize() / (ANIM - step));
             }
-            painter.setFont(font);
+            painter.setFont(f);
             painter.setPen(QPen(Qt::black));
             painter.drawText(rect, Qt::AlignCenter, QString::number(grille[i].valeur));
         }
 
-        if(step == ANIM - 1) {
-            grille[i].nouveau = false;
-            grille[i].fusion = false;
-        }
+    }
+
+    if(step == ANIM - 1) {
+        game.resetAnimFlags();
     }
 }
 //-----------------------------------------------------------------------------
@@ -140,16 +127,15 @@ void CWGame::resizeEvent(QResizeEvent *) {
     forceFont = true;
 }
 //-----------------------------------------------------------------------------
-CWGame::CWGame(QWidget *parent, bool initTimer) : QWidget(parent) {
+CWGame::CWGame(QWidget *parent) : QWidget(parent) {
     forceFont = false;
+    step = 0;
+    enregistrement = false;
+    numeroFrame = 0;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    step = 0;
 
-    if(initTimer) {
-        srand(time(NULL));
-    }
-    nouveau();
+    game.nouveau(true);
 
     timer->setInterval(DELAI);
     timer->start();
@@ -160,106 +146,70 @@ CWGame::~CWGame(void) {
 }
 //-----------------------------------------------------------------------------
 bool CWGame::ajout(bool anim) {
-    int nbVide = 0;
-    int vides[CASE];
-    int i, j;
-
-    for(i=j=0;i<CASE;i++) {
-        if(grille[i].valeur == 0) {
-            nbVide++;
-            vides[j++] = i;
-        }
-    }
-
-    if(nbVide != 0) {
-        int idx = vides[rand() % nbVide];
-        grille[idx].valeur = 2 * (rand() % 2 + 1);
-        if(anim) {
-            grille[idx].nouveau = true;
-        }
-        score = qMax(score, grille[idx].valeur);
-        step = 0;
-
-        return true;
-    }
-
-    return false;
+    bool added = game.ajout(anim);
+    if(added) step = 0;
+    return added;
 }
 //-----------------------------------------------------------------------------
 void CWGame::nouveau(bool anim) {
-    score = 0;
-    gagne = false;
-    memset(grille, 0, CASE * sizeof(SCase));
-
-    ajout(anim);
-    ajout(anim);
+    game.nouveau(anim);
+    step = 0;
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::haut(bool anim) {
-    CDeplacementHaut dep;
-
-    return joue(&dep, anim);
+CGame::EResultat CWGame::haut(bool anim) {
+    step = 0;
+    return game.haut(anim);
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::droite(bool anim) {
-    CDeplacementDroite dep;
-
-    return joue(&dep, anim);
+CGame::EResultat CWGame::droite(bool anim) {
+    step = 0;
+    return game.droite(anim);
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::bas(bool anim) {
-    CDeplacementBas dep;
-
-    return joue(&dep, anim);
+CGame::EResultat CWGame::bas(bool anim) {
+    step = 0;
+    return game.bas(anim);
 }
 //-----------------------------------------------------------------------------
-CWGame::EResultat CWGame::gauche(bool anim) {
-    CDeplacementGauche dep;
-
-    return joue(&dep, anim);
+CGame::EResultat CWGame::gauche(bool anim) {
+    step = 0;
+    return game.gauche(anim);
 }
 //-----------------------------------------------------------------------------
 int CWGame::getScore(void) {
-    return score;
+    return game.getScore();
 }
 //-----------------------------------------------------------------------------
 const TCases& CWGame::getCases(void) const {
-    return grille;
+    return game.getCases();
 }
 //-----------------------------------------------------------------------------
 bool CWGame::perdu(void) {
-    int i;
-
-    for(i=0;i<CASE;i++) {
-        if(grille[i].valeur == 0) {
-            return false;
-        }
-    }
-
-    for(i=0;i<CASE;i++) {
-        if(i / COTE != COTE - 1) {
-            if(grille[i].valeur == grille[i + COTE].valeur) {
-                return false;
-            }
-        }
-        if(i % COTE != COTE - 1) {
-            if(grille[i].valeur == grille[i + 1].valeur) {
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return game.perdu();
 }
 //-----------------------------------------------------------------------------
 int CWGame::getSomme(void) {
-    int i;
-    int s = 0;
-
-    for(i=0;i<CASE;i++) {
-        s += grille[i].valeur;
+    return game.getSomme();
+}
+//-----------------------------------------------------------------------------
+int CWGame::getValeur(int idx) const {
+    return game.getValeur(idx);
+}
+//-----------------------------------------------------------------------------
+CGame& CWGame::getGame(void) {
+    return game;
+}
+//-----------------------------------------------------------------------------
+void CWGame::setEnregistrement(bool actif) {
+    enregistrement = actif;
+    if(actif) {
+        numeroFrame = 0;
+        QDir().mkpath("frames");
     }
-
-    return s;
+}
+//-----------------------------------------------------------------------------
+void CWGame::capturerFrame(void) {
+    if(!enregistrement) return;
+    grab().save(QString("frames/frame_%1.png").arg(numeroFrame++, 6, 10, QChar('0')));
 }
 //-----------------------------------------------------------------------------

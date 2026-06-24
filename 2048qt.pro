@@ -25,30 +25,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    CSolveur.cpp \
         main.cpp \
         CMainWindow.cpp \
     CWGame.cpp \
+    CGame.cpp \
     CDeplacement.cpp \
-    CResolutionDialog.cpp \
-    CGenetic.cpp \
-    CGamer.cpp \
-    CNeurone.cpp \
-    CPerceptron.cpp
+    CBitBoard.cpp
 
 HEADERS += \
     CMainWindow.h \
+    CSolveur.h \
     CWGame.h \
+    CGame.h \
     CDeplacement.h \
-    common.h \
-    CResolutionDialog.h \
-    CGenetic.h \
-    CGamer.h \
-    CNeurone.h \
-    CPerceptron.h
+    CBitBoard.h \
+    common.h
 
 FORMS += \
-        CMainWindow.ui \
-    CResolutionDialog.ui
+        CMainWindow.ui
 
 RESOURCES += \
     2048.qrc
