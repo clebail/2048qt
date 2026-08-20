@@ -4,6 +4,8 @@ Une implémentation du célèbre jeu **2048** en C++ avec le framework **Qt**,
 accompagnée d'un **solveur expectimax** capable d'y jouer tout seul — et
 d'atteindre la tuile **8192**.
 
+🎥 **Le solveur en action :** https://youtu.be/8Eq9VEvhObY
+
 Le but du jeu est de déplacer et fusionner les tuiles portant des puissances de 2
 afin d'atteindre la tuile **2048**.
 
@@ -107,7 +109,8 @@ Tout se règle dans `common.h` :
 
 Le bouton **IA** lance ou arrête le solveur. La case **Enregistrer (PNG)** écrit
 une image dans `frames/` à chaque coup joué par l'IA ; la vidéo s'assemble
-ensuite avec `video/make_video.py`.
+ensuite avec `video/make_video.py`. Le résultat est visible ici :
+https://youtu.be/8Eq9VEvhObY
 
 ## Prérequis
 
